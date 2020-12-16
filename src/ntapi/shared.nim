@@ -1,0 +1,1 @@
+const ntdll* = "ntdll.dll"

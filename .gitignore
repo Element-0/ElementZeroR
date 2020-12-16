@@ -1,0 +1,7 @@
+.nimakefiles
+dist
+pkgs
+*.exe
+*.dll
+*.lib
+*.pdb
