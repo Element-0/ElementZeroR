@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [ 💥 ]
+  pull_request:
+    branches: [ 💥 ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install llvm 11.0
+        run: |
+          Write-Host ('Downloading LLVM')
+          Invoke-WebRequest -Uri "https://github.com/llvm/llvm-project/releases/download/llvmorg-11.0.0/LLVM-11.0.0-win64.exe" -OutFile "C:\LLVM.exe"
+          Write-Host ('Installing LLVM')
+          Start-Process C:\LLVM.exe -Wait -ArgumentList @('/S', '/D=C:\LLVM')
+          Write-Host ('Installed LLVM')
+          echo "::set-env name=CC::clang-cl"
+          echo "::set-env name=CXX::clang-cl"
+          echo "::set-env name=PATH::C:/LLVM/bin;$env:PATH"
+      - name: Install nim
+        uses: jiro4989/setup-nim-action@v1
+      - name: Install dependencies
+        run: |
+          nimble install "https://github.com/codehz/nimake#v0.4.4"
+          nimble install winim
+      - name: Run tests
+        run: nimake build test
+      - name: Build pdbparser
+        run: nimake build pdbparser
+      - name: Build default target
+        run: nimake build
