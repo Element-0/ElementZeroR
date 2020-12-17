@@ -21,6 +21,7 @@ jobs:
           nimble refresh
           nimble install https://github.com/codehz/nimake@#v0.4.4
           nimble install winim
+          nimble install clapfn
       - name: Dump targets
         run: nimake dump
       - name: Run tests
