@@ -21,6 +21,8 @@ jobs:
           nimble refresh
           nimble install https://github.com/codehz/nimake@#v0.4.4
           nimble install winim
+      - name: Dump targets
+        run: nimake dump
       - name: Run tests
         run: nimake build -v:5 test
       - name: Build pdbparser
