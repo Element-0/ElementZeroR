@@ -12,14 +12,6 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install llvm 11.0
-        run: |
-          Write-Host ('Downloading LLVM')
-          Invoke-WebRequest -Uri "https://github.com/llvm/llvm-project/releases/download/llvmorg-11.0.0/LLVM-11.0.0-win64.exe" -OutFile "C:\LLVM.exe"
-          Write-Host ('Installing LLVM')
-          Start-Process C:\LLVM.exe -Wait -ArgumentList @('/S', '/D=C:\LLVM')
-          Write-Host ('Installed LLVM')
-          echo "C:\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Install nim
         uses: jiro4989/setup-nim-action@v1
       - name: Install dependencies
