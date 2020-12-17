@@ -24,6 +24,7 @@ jobs:
         uses: jiro4989/setup-nim-action@v1
       - name: Install dependencies
         run: |
+          nimble refresh
           nimble install https://github.com/codehz/nimake@#v0.4.4
           nimble install winim
       - name: Run tests
