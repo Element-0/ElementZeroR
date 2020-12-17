@@ -1,19 +1,28 @@
-import std/os
+import tables
+
+import winim/mean
+import clapfn
 
 import dia2
-import winim/mean
-import winim/winstr
 
 CoInitializeEx(nil, 0)
 
-proc parse(target: string) =
+var cliparser = ArgumentParser(
+  programName: "pdbparser",
+  fullName: "PDB Parser",
+  description: "Parse bedrock_server.pdb file",
+  version: "0.0.0"
+)
+
+cliparser.addRequiredArgument(name = "pdb_file", help = "PDB file")
+
+proc main(target: string) =
   var source = createDataSource()
   var session = source.loadSession(target)
   var global = session.global
   for symbol in global.findChildren(SymTagPublicSymbol):
     echo "symbol: ", symbol.virtualAddress.toHex, "=", symbol.name
 
-if paramCount() != 1:
-  echo "require 1 argument"
+let args = cliparser.parse()
 
-parse(paramStr 1)
+main(args["pdb_file"])
