@@ -5,6 +5,7 @@ import parsecfg
 
 setCurrentDir getProjectDir()
 
+const depinc = "deps" / "include"
 const cfgfile = "config.inf"
 let cfg = loadConfig cfgfile
 
@@ -74,30 +75,50 @@ target "test":
   receipt:
     echo "Test finished".fgGreen
 
+template generateNimSource(base, mainsrc: string, body: untyped): untyped =
+  let cache {.inject.} = tmpdir / base
+  block:
+    main = base / (mainsrc & ".nim")
+    template pattern(pat: string): untyped =
+      depIt: walkPattern base / pat
+    body
+    deps.excl main
+
+proc nimGenExec(target, cache, main, extra: string): string =
+  &"nim c -o:{target} {extra} --nimcache:{cache} {main}"
+
+template nimExec(target, cache, main, extra: string) =
+  let xtarget = target
+  let xcache = cache
+  let xmain = main
+  let xextra = extra
+  exec nimGenExec(xtarget, xcache, xmain, xextra)
+
 target "dist" / "chakra.dll":
-  main = "src" / "chakra" / "chakra.nim"
-  depIt: walkPattern "src" / "chakra" / "*.cpp"
-  depIt: walkPattern "src" / "chakra" / "*.nim"
-  deps = deps.filterIt(it != main)
-  let cache = tmpdir / "src" / "chakra"
+  generateNimSource("src" / "chakra", "chakra"):
+    pattern "*.cpp"
+    pattern "*.nim"
   clean:
     rm cache
     rm target
   receipt:
+    absolute main
+    absolute target
+    absolute cache
     withDir "src":
-      let rmain = main.relativePath "src"
-      let rtarget = target.relativePath "src"
-      let rcache = cache.relativePath "src"
-      exec &"nim c -o:{rtarget} --app:lib --nimcache:{rcache} {rmain}"
+      nimExec target, cache, main, "--app:lib"
 
-target tmpdir / "chakra-core" / "chakra-core.zip":
-  dep cfgfile
-  lazy = true
-  receipt:
-    mkdir tmpdir / "chakra-core"
-    let url = cfg.getSectionValue("Dependencies", "ChakraCoreRelease")
-    echo "Downloading chakracore from ", url.fgYellow
-    exec &"curl -#Lo {target} {url}"
+template downloadTask(basename, filename, field: string) =
+  target basename / filename:
+    dep cfgfile
+    lazy = true
+    receipt:
+      mkdir basename
+      let url = cfg.getSectionValue("Dependencies", field)
+      echo "Downloading ", filename," from ", url.fgYellow
+      exec "curl -#Lo " & (basename / filename) & " " & url
+
+downloadTask(tmpdir / "chakra-core", "chakra-core.zip", "ChakraCoreRelease")
 
 target tmpdir / "chakra-core" / "x64_release" / "ChakraCore.dll":
   lazy = true
@@ -124,6 +145,30 @@ target "chakra":
   fake = true
   dep "chakra-core"
   dep "dist" / "chakra.dll"
+  receipt: discard
+
+downloadTask("dist", "msdia140.dll", "MSDiaSDK")
+
+target "dist" / "pdbparser.exe":
+  generateNimSource("src" / "pdbparser", "parser"):
+    pattern "*.nim"
+  depIt: walkPattern "src" / "interop" / "*.nim"
+  dep "dist" / "msdia140.dll"
+  clean:
+    rm cache
+    rm target
+  receipt:
+    absolute main
+    absolute target
+    absolute depinc
+    absolute cache
+    withDir "src":
+      nimExec target, cache, main, &"--app:console --cincludes:{depinc}"
+
+target "pdbparser":
+  fake = true
+  dep "dist" / "pdbparser.exe"
+  cleanDep "dist" / "pdbparser.exe"
   receipt: discard
 
 default "chakra"
