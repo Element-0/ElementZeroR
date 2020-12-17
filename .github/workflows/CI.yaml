@@ -12,6 +12,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Visual Studio shell
+        uses: egor-tensin/vs-shell@v2
       - name: Install nim
         uses: jiro4989/setup-nim-action@v1
       - name: Install dependencies
