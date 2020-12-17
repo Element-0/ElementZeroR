@@ -19,9 +19,7 @@ jobs:
           Write-Host ('Installing LLVM')
           Start-Process C:\LLVM.exe -Wait -ArgumentList @('/S', '/D=C:\LLVM')
           Write-Host ('Installed LLVM')
-          echo "::set-env name=CC::clang-cl"
-          echo "::set-env name=CXX::clang-cl"
-          echo "::set-env name=PATH::C:/LLVM/bin;$env:PATH"
+          echo "C:\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Install nim
         uses: jiro4989/setup-nim-action@v1
       - name: Install dependencies
