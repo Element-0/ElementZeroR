@@ -1,9 +1,15 @@
+import ../utils
+
 const sqlite3dll = "sqlite3.dll"
 
 type RawDatabase* = object
+type RawStatement* = object
 
 type Database* = object
   raw*: ptr RawDatabase
+
+type Statement* = object
+  raw*: ptr RawStatement
 
 type ResultCode* {.pure.} = enum
   sr_ok = 0,
@@ -69,23 +75,43 @@ type OpenFlag* {.pure.} = enum
 
 type OpenFlags* = set[OpenFlag]
 
+type PrepareFlag* = enum
+  sp_persistent,
+  sp_normalize,
+  sp_no_vtab
+
+type PrepareFlags* = set[PrepareFlag]
+
 {.push dynlib: sqlite3dll.}
 proc sqlite3_open_v2*(filename: cstring, db: ptr ptr RawDatabase, flags: OpenFlags, vfs: cstring): ResultCode {.importc.}
 proc sqlite3_close_v2*(db: ptr RawDatabase): ResultCode {.importc.}
+proc sqlite3_prepare_v3*(db: ptr RawDatabase, sql: cstring, nbyte: int, flags: PrepareFlags, pstmt: ptr ptr RawStatement, tail: ptr cstring): ResultCode {.importc.}
+proc sqlite3_finalize*(st: ptr RawStatement): ResultCode {.importc.}
 {.pop.}
 
-template if_not_ok(res: ResultCode) =
+template check_sqlite(res: ResultCode) =
   let tmp = res
   if tmp != sr_ok:
     raise newSQLiteError tmp
 
 proc `=destroy`*(db: var Database) =
   if db.raw != nil:
-    if_not_ok sqlite3_close_v2 db.raw
+    check_sqlite sqlite3_close_v2 db.raw
 
-proc opendb*(
+disallow_copy Database
+
+proc `=destroy`*(st: var Statement) =
+  if st.raw != nil:
+    check_sqlite sqlite3_finalize st.raw
+
+disallow_copy Statement
+
+proc initDatabase*(
   filename: string,
   flags: OpenFlags = { so_readwrite, so_create },
   vfs: cstring = nil
-): Database =
-  if_not_ok sqlite3_open_v2(filename, addr result.raw, flags, vfs)
+): Database {.genrefnew.} =
+  check_sqlite sqlite3_open_v2(filename, addr result.raw, flags, vfs)
+
+proc initStatement*(db: var Database, sql: string, flags: PrepareFlags = {}): Statement {.genrefnew.} =
+  check_sqlite sqlite3_prepare_v3(db.raw, sql, sql.len, flags, addr result.raw, nil)

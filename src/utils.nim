@@ -51,3 +51,6 @@ macro genrefnew*(body: untyped): untyped =
     new result
     result[] = `callstmt`
   result.add reffn
+
+template disallow_copy*(T: untyped): untyped =
+  proc `=copy`*(l: var T, r: T) {.error.}
