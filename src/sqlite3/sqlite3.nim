@@ -87,6 +87,7 @@ proc sqlite3_open_v2*(filename: cstring, db: ptr ptr RawDatabase, flags: OpenFla
 proc sqlite3_close_v2*(db: ptr RawDatabase): ResultCode {.importc.}
 proc sqlite3_prepare_v3*(db: ptr RawDatabase, sql: cstring, nbyte: int, flags: PrepareFlags, pstmt: ptr ptr RawStatement, tail: ptr cstring): ResultCode {.importc.}
 proc sqlite3_finalize*(st: ptr RawStatement): ResultCode {.importc.}
+proc sqlite3_step*(st: ptr RawStatement): ResultCode {.importc.}
 {.pop.}
 
 template check_sqlite(res: ResultCode) =
