@@ -113,5 +113,5 @@ proc initDatabase*(
 ): Database {.genrefnew.} =
   check_sqlite sqlite3_open_v2(filename, addr result.raw, flags, vfs)
 
-proc initStatement*(db: var Database, sql: string, flags: PrepareFlags = {}): Statement {.genrefnew.} =
+proc initStatement*(db: var Database | var ref Database, sql: string, flags: PrepareFlags = {}): Statement {.genrefnew.} =
   check_sqlite sqlite3_prepare_v3(db.raw, sql, sql.len, flags, addr result.raw, nil)
