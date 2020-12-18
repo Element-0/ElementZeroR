@@ -123,6 +123,7 @@ downloadTask(tmpdir / "chakra-core", "chakra-core.zip", "ChakraCoreRelease")
 target tmpdir / "chakra-core" / "x64_release" / "ChakraCore.dll":
   lazy = true
   main = tmpdir / "chakra-core" / "chakra-core.zip"
+  output tmpdir / "chakra-core" / "x64_release" / "ChakraCore.pdb"
   receipt:
     withDir tmpdir / "chakra-core":
       exec &"tar xf chakra-core.zip"
@@ -139,6 +140,8 @@ target "chakra-core":
   fake = true
   depCopy(tmpdir / "chakra-core" / "x64_release" / "ChakraCore.dll", "dist" / "ChakraCore.dll")
   depCopy(tmpdir / "chakra-core" / "x64_release" / "ChakraCore.pdb", "dist" / "ChakraCore.pdb")
+  clean:
+    rm tmpdir / "chakra-core"
   receipt: discard
 
 target "chakra":
