@@ -1,3 +1,4 @@
 [Dependencies]
 ChakraCoreRelease = "https://aka.ms/chakracore/cc_windows_all_1_11_24"
 MSDiaSDK = "https://ipfs.io/ipfs/QmcjcskLLr1uKpNssH7im9dgM4tAubj9noUgfow6tR4QDH/msdia140.dll"
+SQLite3 = "https://www.sqlite.org/2020/sqlite-amalgamation-3340000.zip"

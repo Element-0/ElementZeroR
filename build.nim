@@ -171,6 +171,20 @@ target "pdbparser":
   cleanDep "dist" / "pdbparser.exe"
   receipt: discard
 
+downloadTask(tmpdir / "sqlite3", "sqlite3.zip", "SQLite3")
+
+template extractSqlite3(filename: string): untyped =
+  target tmpdir / "sqlite3" / filename:
+    main = tmpdir / "sqlite3" / "sqlite3.zip"
+    receipt:
+      withDir tmpdir / "sqlite3":
+        relative main
+        exec "tar xOf $1 */$2 > $2".format(main, filename)
+
+extractSqlite3("sqlite3.c")
+extractSqlite3("sqlite3ext.h")
+extractSqlite3("sqlite3.h")
+
 default "chakra"
 
 handleCLI()
