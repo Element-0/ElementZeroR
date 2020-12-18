@@ -1,7 +1,9 @@
 const sqlite3dll = "sqlite3.dll"
 
+type RawDatabase* = object
+
 type Database* = object
-  raw: pointer
+  raw*: ptr RawDatabase
 
 type ResultCode* {.pure.} = enum
   sr_ok = 0,
@@ -68,8 +70,8 @@ type OpenFlag* {.pure.} = enum
 type OpenFlags* = set[OpenFlag]
 
 {.push dynlib: sqlite3dll.}
-proc sqlite3_open_v2(filename: cstring, db: ptr Database, flags: OpenFlags, vfs: cstring): ResultCode {.importc.}
-proc sqlite3_close_v2(db: pointer): ResultCode {.importc.}
+proc sqlite3_open_v2*(filename: cstring, db: ptr ptr RawDatabase, flags: OpenFlags, vfs: cstring): ResultCode {.importc.}
+proc sqlite3_close_v2*(db: ptr RawDatabase): ResultCode {.importc.}
 {.pop.}
 
 template if_not_ok(res: ResultCode) =
@@ -86,4 +88,4 @@ proc opendb*(
   flags: OpenFlags = { so_readwrite, so_create },
   vfs: cstring = nil
 ): Database =
-  if_not_ok sqlite3_open_v2(filename, addr result, flags, vfs)
+  if_not_ok sqlite3_open_v2(filename, addr result.raw, flags, vfs)
