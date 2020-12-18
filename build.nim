@@ -188,6 +188,34 @@ extractSqlite3("sqlite3.c")
 extractSqlite3("sqlite3ext.h")
 extractSqlite3("sqlite3.h")
 
+target "dist" / "sqlite3.dll":
+  output "dist" / "sqlite3.lib"
+  main = tmpdir / "sqlite3" / "sqlite3.c"
+  const defs = [
+    "SQLITE_API=__declspec(dllexport)",
+    "SQLITE_DQS=0",
+    "SQLITE_THREADSAFE=0",
+    "SQLITE_DEFAULT_MEMSTATUS=0",
+    "SQLITE_DEFAULT_WAL_SYNCHRONOUS=1",
+    "SQLITE_LIKE_DOESNT_MATCH_BLOBS=1",
+    "SQLITE_MAX_EXPR_DEPTH=0",
+    "SQLITE_OMIT_DEPRECATED",
+    "SQLITE_OMIT_PROGRESS_CALLBACK",
+    "SQLITE_OMIT_SHARED_CACHE",
+    "SQLITE_USE_ALLOCA",
+    "SQLITE_OMIT_AUTOINIT",
+    "SQLITE_OMIT_DEPRECATED",
+    "SQLITE_WIN32_MALLOC",
+    "SQLITE_ENABLE_FTS5",
+    "SQLITE_ENABLE_JSON1",
+    "SQLITE_ENABLE_RTREE",
+    "SQLITE_ENABLE_SNAPSHOT",
+    "SQLITE_DISABLE_LFS",
+    "SQLITE_DISABLE_DIRSYNC",
+  ]
+  receipt:
+    exec &"clang-cl /LD /MD /O2 /Qvec /Fe{target} {main} -Wno-deprecated-declarations " & defs.mapIt("/D " & it).join(" ")
+
 default "chakra"
 
 handleCLI()
