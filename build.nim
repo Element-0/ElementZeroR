@@ -216,6 +216,11 @@ target "dist" / "sqlite3.dll":
   receipt:
     exec &"clang-cl /LD /MD /O2 /Qvec /Fe{target} {main} -Wno-deprecated-declarations " & defs.mapIt("/D " & it).join(" ")
 
+target "sqlite3":
+  fake = true
+  main = "dist" / "sqlite3.dll"
+  receipt: discard
+
 default "chakra"
 
 handleCLI()
