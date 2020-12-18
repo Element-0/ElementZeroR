@@ -111,7 +111,6 @@ template nimExec(target, cache, main, extra: string) =
 
 target "dist" / "chakra.dll":
   dep "dist"
-  cleanDep "dist"
   generateNimSource("src" / "chakra", "chakra"):
     pattern "*.cpp"
     pattern "*.nim"
@@ -171,7 +170,6 @@ downloadTask("dist", "msdia140.dll", "MSDiaSDK")
 
 target "dist" / "pdbparser.exe":
   dep "dist"
-  cleanDep "dist"
   generateNimSource("src" / "pdbparser", "parser"):
     pattern "*.nim"
   depIt: walkPattern "src" / "interop" / "*.nim"
@@ -209,7 +207,6 @@ extractSqlite3("sqlite3.h")
 
 target "dist" / "sqlite3.dll":
   dep "dist"
-  cleanDep "dist"
   output "dist" / "sqlite3.lib"
   main = tmpdir / "sqlite3" / "sqlite3.c"
   dep "src" / "sqlite3" / "sqlite3init.c"
