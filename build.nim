@@ -83,6 +83,13 @@ target "test":
   receipt:
     echo "Test finished".fgGreen
 
+target "dist":
+  fake = true
+  clean:
+    rm target
+  receipt:
+    mkdir target
+
 template generateNimSource(base, mainsrc: string, body: untyped): untyped =
   let cache {.inject.} = tmpdir / base
   block:
@@ -103,6 +110,8 @@ template nimExec(target, cache, main, extra: string) =
   exec nimGenExec(xtarget, xcache, xmain, xextra)
 
 target "dist" / "chakra.dll":
+  dep "dist"
+  cleanDep "dist"
   generateNimSource("src" / "chakra", "chakra"):
     pattern "*.cpp"
     pattern "*.nim"
@@ -161,6 +170,8 @@ target "chakra":
 downloadTask("dist", "msdia140.dll", "MSDiaSDK")
 
 target "dist" / "pdbparser.exe":
+  dep "dist"
+  cleanDep "dist"
   generateNimSource("src" / "pdbparser", "parser"):
     pattern "*.nim"
   depIt: walkPattern "src" / "interop" / "*.nim"
@@ -197,6 +208,8 @@ extractSqlite3("sqlite3ext.h")
 extractSqlite3("sqlite3.h")
 
 target "dist" / "sqlite3.dll":
+  dep "dist"
+  cleanDep "dist"
   output "dist" / "sqlite3.lib"
   main = tmpdir / "sqlite3" / "sqlite3.c"
   dep "src" / "sqlite3" / "sqlite3init.c"
