@@ -28,5 +28,7 @@ jobs:
         run: nimake build -v:5 test
       - name: Build pdbparser
         run: nimake build -v:5 pdbparser
+      - name: Build sqlite3
+        run: nimake build -v:5 sqlite3
       - name: Build default target
         run: nimake build -v:5
