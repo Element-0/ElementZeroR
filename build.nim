@@ -11,7 +11,7 @@ let cfg = loadConfig cfgfile
 
 var testscategories: seq[string]
 
-proc testtargets(subname: string, subfolder: string, deps: openarray[string], extra: openarray[string]) =
+proc testtargets(subname: string, subfolder: string, deps, extra, external: openarray[string]) =
   testscategories.add subfolder
   var targets: seq[string]
   for x in deps:
@@ -23,13 +23,14 @@ proc testtargets(subname: string, subfolder: string, deps: openarray[string], ex
     let src = "tests" / subfolder / ( x & ".nim")
     let xexe = x.toExe()
     targets.add tmprun
-    capture src, extra:
+    capture src, extra, external:
       target tmprun:
         name = tmprunname
         dep tmp
         fake = true
         receipt:
-          echo "here"
+          let dist = "dist".absolutePath
+          putEnv "PATH", dist & ";" & getEnv("PATH")
           withDir tmpdir / "tests" / subfolder:
             exec xexe
       target tmp:
@@ -37,16 +38,22 @@ proc testtargets(subname: string, subfolder: string, deps: openarray[string], ex
         dep tmpdir / "tests" / subfolder
         for ex in extra:
           dep "tests" / subfolder / ex
+        for ex in external:
+          if ex.contains "*":
+            depIt walkPattern ex
+          else:
+            dep ex
         main = src
         clean:
           rm target
           rm target[0..^5] & ".pdb"
         receipt:
+          absolute target
+          absolute main
+          absolute src
+          absolute tmpcache
           withDir "tests":
-            let rtarget = target.relativePath "tests"
-            let rmain = main.relativePath "tests"
-            let xsrc = "src".relativePath "tests"
-            exec &"nim c -o:{rtarget} --path:{xsrc} --nimcache:{tmpcache} {rmain}"
+            exec &"nim c -o:{target} --path:{src} --nimcache:{tmpcache} {main}"
 
   target tmpdir / "tests" / subfolder:
     fake = true
@@ -63,8 +70,9 @@ proc testtargets(subname: string, subfolder: string, deps: openarray[string], ex
     receipt:
       echo fgGreen &"{name} done"
 
-testtargets("C++ Interop", "interop", ["tcppstr", "tcppvector"], ["test.cpp"])
-testtargets("NT Internal API", "ntapi", ["ttransaction"], [])
+testtargets("C++ Interop", "interop", ["tcppstr", "tcppvector"], ["test.cpp"], [])
+testtargets("NT Internal API", "ntapi", ["ttransaction"], [], [])
+testtargets("SQLIte3", "sqlite3", ["basic"], [], ["dist" / "sqlite3.dll", "src" / "sqlite3" / "*.nim"])
 
 target "test":
   fake = true

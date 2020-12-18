@@ -1,4 +1,3 @@
-// #include <sqlite3>
 #include <windows.h>
 
 extern int sqlite3_initialize(void);
