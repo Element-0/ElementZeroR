@@ -68,14 +68,18 @@ type OpenFlag* {.pure.} = enum
 type OpenFlags* = set[OpenFlag]
 
 {.push dynlib: sqlite3dll.}
-proc sqlite3_open*(filename: cstring, db: ptr Database): ResultCode {.importc.}
-proc sqlite3_open_v2*(filename: cstring, db: ptr Database, flags: OpenFlags, vfs: cstring): ResultCode {.importc.}
+proc sqlite3_open_v2(filename: cstring, db: ptr Database, flags: OpenFlags, vfs: cstring): ResultCode {.importc.}
+proc sqlite3_close_v2(db: pointer): ResultCode {.importc.}
 {.pop.}
 
 template if_not_ok(res: ResultCode) =
   let tmp = res
   if tmp != sr_ok:
     raise newSQLiteError tmp
+
+proc `=destroy`*(db: var Database) =
+  if db.raw != nil:
+    if_not_ok sqlite3_close_v2 db.raw
 
 proc opendb*(
   filename: string,
