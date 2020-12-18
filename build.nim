@@ -191,6 +191,7 @@ extractSqlite3("sqlite3.h")
 target "dist" / "sqlite3.dll":
   output "dist" / "sqlite3.lib"
   main = tmpdir / "sqlite3" / "sqlite3.c"
+  dep "src" / "sqlite3" / "sqlite3init.c"
   const defs = [
     "SQLITE_API=__declspec(dllexport)",
     "SQLITE_DQS=0",
@@ -214,7 +215,7 @@ target "dist" / "sqlite3.dll":
     "SQLITE_DISABLE_DIRSYNC",
   ]
   receipt:
-    exec &"clang-cl /LD /MD /O2 /Qvec /Fe{target} {main} -Wno-deprecated-declarations " & defs.mapIt("/D " & it).join(" ")
+    exec &"clang-cl /LD /MD /O2 /Qvec /Fe{target} -Wno-deprecated-declarations {main} " & deps.toSeq.join(" ") & " " & defs.mapIt("/D " & it).join(" ")
 
 target "sqlite3":
   fake = true
