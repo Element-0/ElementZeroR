@@ -233,7 +233,7 @@ target "dist" / "sqlite3.dll":
     "SQLITE_DISABLE_DIRSYNC",
   ]
   receipt:
-    exec &"clang-cl /LD /MD /O2 /Qvec /Fe{target} -Wno-deprecated-declarations {main} " & deps.toSeq.join(" ") & " " & defs.mapIt("/D " & it).join(" ")
+    exec &"clang-cl /LD /MD /O2 /Qvec /Fe{target} -Wno-deprecated-declarations {main} " & deps.toSeq.filterIt(it.endsWith ".c").join(" ") & " " & defs.mapIt("/D " & it).join(" ")
 
 target "sqlite3":
   fake = true
