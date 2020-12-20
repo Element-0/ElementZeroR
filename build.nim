@@ -173,6 +173,7 @@ target "dist" / "pdbparser.exe":
   generateNimSource("src" / "pdbparser", "parser"):
     pattern "*.nim"
   depIt: walkPattern "src" / "interop" / "*.nim"
+  depIt: walkPattern "src" / "sqlite3" / "*.nim"
   dep "dist" / "msdia140.dll"
   clean:
     rm cache
