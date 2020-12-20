@@ -117,6 +117,7 @@ proc sqlite3_close_v2*(db: ptr RawDatabase): ResultCode {.importc.}
 proc sqlite3_prepare_v3*(db: ptr RawDatabase, sql: cstring, nbyte: int, flags: PrepareFlags, pstmt: ptr ptr RawStatement, tail: ptr cstring): ResultCode {.importc.}
 proc sqlite3_finalize*(st: ptr RawStatement): ResultCode {.importc.}
 proc sqlite3_step*(st: ptr RawStatement): ResultCode {.importc.}
+proc sqlite3_bind_parameter_index*(st: ptr RawStatement, name: cstring): int {.importc.}
 proc sqlite3_bind_blob64*(st: ptr RawStatement, idx: int, buffer: pointer, len: int, free: SqliteDestroctor): ResultCode {.importc.}
 proc sqlite3_bind_double*(st: ptr RawStatement, idx: int, value: float64): ResultCode {.importc.}
 proc sqlite3_bind_int64*(st: ptr RawStatement, idx: int, val: int64): ResultCode {.importc.}
@@ -182,6 +183,11 @@ proc changes*(st: var Statement): int {.genref.} =
 
 proc initStatement*(db: var Database | var ref Database, sql: string, flags: PrepareFlags = {}): Statement {.genrefnew.} =
   check_sqlite sqlite3_prepare_v3(db.raw, sql, sql.len, flags, addr result.raw, nil)
+
+proc getParameterIndex*(st: var Statement, name: string): int {.genref.} =
+  result = sqlite3_bind_parameter_index(st.raw, name)
+  if result == 0:
+    raise newException(SQLiteError, "Unknown parameter " & name)
 
 proc `[]=`*(st: var Statement, idx: int, blob: openarray[byte]) {.genref.} =
   st.raw.check_sqlite_stmt sqlite3_bind_blob64(st.raw, idx, blob.unsafeAddr, blob.len, TransientDestructor)
