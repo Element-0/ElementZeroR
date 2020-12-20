@@ -24,6 +24,9 @@ template ptrMath*(body: untyped) =
 
   body
 
+proc refVar(n: NimNode): NimNode =
+  if n.kind == nnkVarTy: nnkVarTy.newTree nnkRefTy.newTree n[0] else: nnkRefTy.newTree n
+
 macro genref*(body: untyped): untyped =
   # body.expectKind nnkProcDef
   result = newStmtList(body)
@@ -33,7 +36,7 @@ macro genref*(body: untyped): untyped =
   var callstmt = nnkCall.newTree(id, nnkBracketExpr.newTree(selfid))
   for item in body[3][2..<body[3].len]:
     callstmt.add item[0]
-  reffn[3][1][1] = nnkRefTy.newTree body[3][1][1]
+  reffn[3][1][1] = refVar body[3][1][1]
   reffn[6] = callstmt
   result.add reffn
 
