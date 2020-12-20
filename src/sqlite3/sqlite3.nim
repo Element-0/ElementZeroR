@@ -255,3 +255,9 @@ proc getColumn*(st: Statement, idx: int, T: typedesc[SomeOrdinal]): SomeOrdinal 
 
 proc getColumn*(st: Statement, idx: int, T: typedesc[string]): string {.genref.} =
   $sqlite3_column_text(st.raw, idx)
+
+proc exec*(db: var Database, sql: string) {.genref.} =
+  var st = db.fetchStatement(sql)
+  defer: st.reset()
+  if st.step():
+    raise newException(SQLiteError, "Cannot iterate with db.exec")
