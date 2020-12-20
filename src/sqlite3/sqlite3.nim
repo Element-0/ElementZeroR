@@ -119,6 +119,7 @@ proc sqlite3_open_v2*(filename: cstring, db: ptr ptr RawDatabase, flags: OpenFla
 proc sqlite3_close_v2*(db: ptr RawDatabase): ResultCode {.importc.}
 proc sqlite3_prepare_v3*(db: ptr RawDatabase, sql: cstring, nbyte: int, flags: PrepareFlags, pstmt: ptr ptr RawStatement, tail: ptr cstring): ResultCode {.importc.}
 proc sqlite3_finalize*(st: ptr RawStatement): ResultCode {.importc.}
+proc sqlite3_reset*(st: ptr RawStatement): ResultCode {.importc.}
 proc sqlite3_step*(st: ptr RawStatement): ResultCode {.importc.}
 proc sqlite3_bind_parameter_index*(st: ptr RawStatement, name: cstring): int {.importc.}
 proc sqlite3_bind_blob64*(st: ptr RawStatement, idx: int, buffer: pointer, len: int, free: SqliteDestroctor): ResultCode {.importc.}
@@ -186,7 +187,7 @@ proc changes*(st: var Database): int {.genref.} =
 proc changes*(st: var Statement): int {.genref.} =
   sqlite3_changes sqlite3_db_handle st.raw
 
-proc initStatement*(db: var Database | ref Database, sql: string, flags: PrepareFlags = {}): Statement {.genrefnew.} =
+proc initStatement*(db: var Database | var ref Database, sql: string, flags: PrepareFlags = {}): Statement {.genrefnew.} =
   check_sqlite sqlite3_prepare_v3(db.raw, sql, sql.len, flags, addr result.raw, nil)
 
 proc fetchStatement*(db: var Database, sql: string): ref Statement {.genref.} =
@@ -216,6 +217,9 @@ proc `[]=`*(st: var Statement, idx: int, val: type(nil)) {.genref.} =
 proc `[]=`*(st: var Statement, idx: int, val: string) {.genref.} =
   st.raw.check_sqlite_stmt sqlite3_bind_text64(st.raw, idx, val, val.len, TransientDestructor, enc_utf8)
 
+proc reset*(st: var Statement) {.genref.} =
+  st.raw.check_sqlite_stmt sqlite3_reset(st.raw)
+
 proc step*(st: var Statement): bool {.genref.} =
   let res = sqlite3_step(st.raw)
   case res:
@@ -223,31 +227,31 @@ proc step*(st: var Statement): bool {.genref.} =
   of sr_done: false
   else: raise newSQLiteError(st.raw)
 
-proc last_insert_rowid*(st: var Database): int {.genref.} =
+proc last_insert_rowid*(st: Database): int {.genref.} =
   sqlite3_last_insert_rowid(st.raw)
 
-proc last_insert_rowid*(st: var Statement): int {.genref.} =
+proc last_insert_rowid*(st: Statement): int {.genref.} =
   sqlite3_last_insert_rowid(sqlite3_db_handle st.raw)
 
-proc withColumnBlob*(st: var Statement, idx: int, recv: proc(vm: openarray[byte])) {.genref.} =
+proc withColumnBlob*(st: Statement, idx: int, recv: proc(vm: openarray[byte])) {.genref.} =
   let p = sqlite3_column_blob(st.raw, idx)
   let l = sqlite3_column_bytes(st.raw, idx)
   recv(cast[ptr UncheckedArray[byte]](p).toOpenArray(0, l))
 
-proc getColumnType*(st: var Statement, idx: int): SqliteDateType {.genref.} =
+proc getColumnType*(st: Statement, idx: int): SqliteDateType {.genref.} =
   sqlite3_column_type(st.raw, idx)
 
-proc getColumn*(st: var Statement, idx: int, T: typedesc[seq[byte]]): seq[byte] {.genref.} =
+proc getColumn*(st: Statement, idx: int, T: typedesc[seq[byte]]): seq[byte] {.genref.} =
   let p = cast[ptr UncheckedArray[byte]](sqlite3_column_blob(st.raw, idx))
   let l = sqlite3_column_bytes(st.raw, idx)
   result = newSeq[byte] l
   copyMem(addr result[0], p, l)
 
-proc getColumn*(st: var Statement, idx: int, T: typedesc[SomeFloat]): SomeFloat {.genref.} =
+proc getColumn*(st: Statement, idx: int, T: typedesc[SomeFloat]): SomeFloat {.genref.} =
   cast[T](sqlite3_column_double(st.raw, idx))
 
-proc getColumn*(st: var Statement, idx: int, T: typedesc[SomeOrdinal]): SomeOrdinal {.genref.} =
+proc getColumn*(st: Statement, idx: int, T: typedesc[SomeOrdinal]): SomeOrdinal {.genref.} =
   cast[T](sqlite3_column_int64(st.raw, idx))
 
-proc getColumn*(st: var Statement, idx: int, T: typedesc[string]): string {.genref.} =
+proc getColumn*(st: Statement, idx: int, T: typedesc[string]): string {.genref.} =
   $sqlite3_column_text(st.raw, idx)
