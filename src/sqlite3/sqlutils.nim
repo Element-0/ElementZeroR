@@ -199,3 +199,33 @@ macro importdb*(sql: static string, body: untyped) =
   else:
     error("Expected proc or iterator, got " & $body.kind, body)
     return
+
+type Transaction*[Origin: ptr Database | ref Database] = object
+  origin: Origin
+  done: bool
+
+proc `=destroy`*[Origin: ptr Database | ref Database](tran: var Transaction[Origin]) =
+  if tran.origin == nil:
+    return
+  if not tran.done:
+    tran.origin[].exec "ROLLBACK"
+
+proc `=copy`*[Origin: ptr Database | ref Database](tran: var Transaction[Origin], rhs: Transaction[Origin]) {.error.}
+
+proc initTransaction*(db: var Database): Transaction[ptr Database] {.genrefnew.} =
+  db.exec "BEGIN"
+  result.origin = addr db
+  result.done = false
+
+proc initTransaction*(db: var ref Database): Transaction[ref Database] {.genrefnew.} =
+  db.exec "BEGIN"
+  result.origin = db
+  result.done = false
+
+proc commit*[Origin: ptr Database | ref Database](tran: var Transaction[Origin]) =
+  tran.done = true
+  tran.origin[].exec "COMMIT"
+
+proc rollback*[Origin: ptr Database | ref Database](tran: var Transaction[Origin]) =
+  tran.done = true
+  tran.origin[].exec "ROLLBACK"

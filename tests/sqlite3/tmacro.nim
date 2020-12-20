@@ -24,3 +24,16 @@ suite "Macro test":
 
   test "update data":
     check 2 == db.insertPair("test2")
+
+  test "query first data with transaction commit":
+    var tran = db.initTransaction()
+    check 2 == db.insertPair("test2")
+    tran.commit()
+    for x in db.selectIds(2):
+      check x == (value: "test2")
+
+  test "query first data with transaction rollback":
+    var tran = db.initTransaction()
+    check 2 == db.insertPair("test3")
+    tran.rollback()
+    check 2 == db.insertPair("test2")
