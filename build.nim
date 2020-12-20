@@ -23,7 +23,7 @@ proc testtargets(subname: string, subfolder: string, deps, extra, external: open
     let src = "tests" / subfolder / ( x & ".nim")
     let xexe = x.toExe()
     targets.add tmprun
-    capture src, extra, external:
+    capture xexe, src, extra, external:
       target tmprun:
         name = tmprunname
         dep tmp
@@ -72,7 +72,7 @@ proc testtargets(subname: string, subfolder: string, deps, extra, external: open
 
 testtargets("C++ Interop", "interop", ["tcppstr", "tcppvector"], ["test.cpp"], [])
 testtargets("NT Internal API", "ntapi", ["ttransaction"], [], [])
-testtargets("SQLIte3", "sqlite3", ["basic"], [], ["dist" / "sqlite3.dll", "src" / "sqlite3" / "*.nim"])
+testtargets("SQLIte3", "sqlite3", ["basic", "tmacro"], [], ["dist" / "sqlite3.dll", "src" / "sqlite3" / "*.nim"])
 
 target "test":
   fake = true
