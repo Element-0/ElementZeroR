@@ -26,7 +26,7 @@ suite "Basic bindings":
     check createtable.step() == false
     checkpoint "created db"
     block:
-      var st = db.initStatement("INSERT INTO test (value) VALUES (?)")
+      var st = db.fetchStatement("INSERT INTO test (value) VALUES (?)")
       st[1] = "test"
       check st.step() == false
       check db.changes == 1
