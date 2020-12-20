@@ -1,3 +1,5 @@
+import tables
+
 import ../utils
 
 const sqlite3dll = "sqlite3.dll"
@@ -6,11 +8,12 @@ type RawDatabase* = object
 type RawStatement* = object
 type RawValue* = object
 
-type Database* = object
-  raw*: ptr RawDatabase
-
 type Statement* = object
   raw*: ptr RawStatement
+
+type Database* = object
+  raw*: ptr RawDatabase
+  stmtcache: Table[string, ref Statement]
 
 type ResultCode* {.pure.} = enum
   sr_ok = 0,
@@ -156,17 +159,18 @@ template check_sqlite_stmt(st: ptr RawStatement, res: ResultCode) =
   if tmp != sr_ok:
     raise newSQLiteError st
 
-proc `=destroy`*(db: var Database) =
-  if db.raw != nil:
-    check_sqlite sqlite3_close_v2 db.raw
-
-disallow_copy Database
-
 proc `=destroy`*(st: var Statement) =
   if st.raw != nil:
     check_sqlite sqlite3_finalize st.raw
 
 disallow_copy Statement
+
+proc `=destroy`*(db: var Database) =
+  if db.raw != nil:
+    db.stmtcache.clear()
+    check_sqlite sqlite3_close_v2 db.raw
+
+disallow_copy Database
 
 proc initDatabase*(
   filename: string,
@@ -174,6 +178,7 @@ proc initDatabase*(
   vfs: cstring = nil
 ): Database {.genrefnew.} =
   check_sqlite sqlite3_open_v2(filename, addr result.raw, flags, vfs)
+  result.stmtcache = initTable[string, ref Statement]()
 
 proc changes*(st: var Database): int {.genref.} =
   sqlite3_changes st.raw
@@ -181,8 +186,15 @@ proc changes*(st: var Database): int {.genref.} =
 proc changes*(st: var Statement): int {.genref.} =
   sqlite3_changes sqlite3_db_handle st.raw
 
-proc initStatement*(db: var Database | var ref Database, sql: string, flags: PrepareFlags = {}): Statement {.genrefnew.} =
+proc initStatement*(db: var Database | ref Database, sql: string, flags: PrepareFlags = {}): Statement {.genrefnew.} =
   check_sqlite sqlite3_prepare_v3(db.raw, sql, sql.len, flags, addr result.raw, nil)
+
+proc fetchStatement*(db: var Database, sql: string): ref Statement {.genref.} =
+  if sql in db.stmtcache:
+    return db.stmtcache[sql]
+  else:
+    result = db.newStatement(sql, { sp_persistent })
+    db.stmtcache[sql] = result
 
 proc getParameterIndex*(st: var Statement, name: string): int {.genref.} =
   result = sqlite3_bind_parameter_index(st.raw, name)
