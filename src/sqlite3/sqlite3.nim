@@ -51,6 +51,16 @@ type SQLiteError* = object of IOError
 proc newSQLiteError(code: ResultCode): ref SQLiteError =
   newException(SQLiteError, $code)
 
+type SQLiteBlob* = object
+  raw: ptr UncheckedArray[byte]
+  len: int
+
+proc raw*(blob: SQLiteBlob): ptr UncheckedArray[byte] = blob.raw
+proc len*(blob: SQLiteBlob): int = blob.len
+
+template toOpenArray*(blob: SQLiteBlob): untyped =
+  blob.raw.toOpenArray(0, raw.len)
+
 type OpenFlag* {.pure.} = enum
   so_readonly,
   so_readwrite,
@@ -94,6 +104,13 @@ type SqliteDestroctor* = proc (p: pointer) {.cdecl.}
 const StaticDestructor* = cast[SqliteDestroctor](0)
 const TransientDestructor* = cast[SqliteDestroctor](-1)
 
+type SqliteDateType* = enum
+  dt_integer = 1,
+  dt_float = 2,
+  dt_text = 3,
+  dt_blob = 4,
+  dt_null = 5
+
 {.push dynlib: sqlite3dll.}
 proc sqlite3_open_v2*(filename: cstring, db: ptr ptr RawDatabase, flags: OpenFlags, vfs: cstring): ResultCode {.importc.}
 proc sqlite3_close_v2*(db: ptr RawDatabase): ResultCode {.importc.}
@@ -109,6 +126,13 @@ proc sqlite3_bind_value*(st: ptr RawStatement, idx: int, val: ptr RawValue): Res
 proc sqlite3_bind_pointer*(st: ptr RawStatement, idx: int, val: pointer, name: cstring, free: SqliteDestroctor): ResultCode {.importc.}
 proc sqlite3_bind_zeroblob64*(st: ptr RawStatement, idx: int, len: int): ResultCode {.importc.}
 proc sqlite3_changes*(st: ptr RawDatabase): int {.importc.}
+proc sqlite3_column_type*(st: ptr RawStatement, idx: int): SqliteDateType {.importc.}
+proc sqlite3_column_blob*(st: ptr RawStatement, idx: int): pointer {.importc.}
+proc sqlite3_column_bytes*(st: ptr RawStatement, idx: int): int {.importc.}
+proc sqlite3_column_double*(st: ptr RawStatement, idx: int): float64 {.importc.}
+proc sqlite3_column_int64*(st: ptr RawStatement, idx: int): int64 {.importc.}
+proc sqlite3_column_text*(st: ptr RawStatement, idx: int): cstring {.importc.}
+proc sqlite3_column_value*(st: ptr RawStatement, idx: int): ptr RawValue {.importc.}
 {.pop.}
 
 template check_sqlite(res: ResultCode) =
@@ -144,11 +168,11 @@ proc initStatement*(db: var Database | var ref Database, sql: string, flags: Pre
 proc `[]=`*(st: var Statement, idx: int, blob: openarray[byte]) {.genref.} =
   check_sqlite sqlite3_bind_blob64(st.raw, idx, blob.unsafeAddr, blob.len, TransientDestructor)
 
-proc `[]=`*(st: var Statement, idx: int, val: float | float32 | float64) {.genref.} =
+proc `[]=`*(st: var Statement, idx: int, val: SomeFloat) {.genref.} =
   check_sqlite sqlite3_bind_double(st.raw, idx, float64 val)
 
-proc `[]=`*(st: var Statement, idx: int, val: int | int32 | int64 | int16 | int8 | uint8 | uint16 | uint32 | uint64) {.genref.} =
-  check_sqlite sqlite3_bind_double(st.raw, idx, cast[int64](val))
+proc `[]=`*(st: var Statement, idx: int, val: SomeOrdinal) {.genref.} =
+  check_sqlite sqlite3_bind_int64(st.raw, idx, cast[int64](val))
 
 proc `[]=`*(st: var Statement, idx: int, val: type(nil)) {.genref.} =
   check_sqlite sqlite3_bind_null(st.raw, idx)
@@ -162,3 +186,26 @@ proc step*(st: var Statement): bool {.genref.} =
   of sr_row: true
   of sr_done: false
   else: raise newSQLiteError(res)
+
+proc withColumnBlob*(st: var Statement, idx: int, recv: proc(vm: openarray[byte])) {.genref.} =
+  let p = sqlite3_column_blob(st.raw, idx)
+  let l = sqlite3_column_bytes(st.raw, idx)
+  recv(cast[ptr UncheckedArray[byte]](p).toOpenArray(0, l))
+
+proc getColumnType*(st: var Statement, idx: int): SqliteDateType {.genref.} =
+  sqlite3_column_type(st.raw, idx)
+
+proc getColumn*(st: var Statement, idx: int, T: typedesc[seq[byte]]): seq[byte] {.genref.} =
+  let p = cast[ptr UncheckedArray[byte]](sqlite3_column_blob(st.raw, idx))
+  let l = sqlite3_column_bytes(st.raw, idx)
+  result = newSeq[byte] l
+  copyMem(addr result[0], p, l)
+
+proc getColumn*(st: var Statement, idx: int, T: typedesc[SomeFloat]): SomeFloat {.genref.} =
+  cast[T](sqlite3_column_double(st.raw, idx))
+
+proc getColumn*(st: var Statement, idx: int, T: typedesc[SomeOrdinal]): SomeOrdinal {.genref.} =
+  cast[T](sqlite3_column_int64(st.raw, idx))
+
+proc getColumn*(st: var Statement, idx: int, T: typedesc[string]): string {.genref.} =
+  $sqlite3_column_text(st.raw, idx)
