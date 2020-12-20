@@ -4,7 +4,7 @@ import sqlite3/sqlite3
 
 suite "Basic bindings":
   setup:
-    var db = initDatabase ""
+    var db {.used.} = initDatabase ""
 
   test "Open memory db":
     check true
