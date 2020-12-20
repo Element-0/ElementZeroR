@@ -19,7 +19,7 @@ suite "Basic bindings":
     var insertdata = db.initStatement("INSERT INTO test VALUES (?)")
     insertdata[1] = 123
     check insertdata.step() == false
-    check db.changes == 1
+    check insertdata.changes == 1
 
   test "Complete test":
     var createtable = db.initStatement("CREATE TABLE test(id INTEGER PRIMARY KEY, value TEXT)")

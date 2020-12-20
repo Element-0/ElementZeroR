@@ -126,6 +126,7 @@ proc sqlite3_bind_value*(st: ptr RawStatement, idx: int, val: ptr RawValue): Res
 proc sqlite3_bind_pointer*(st: ptr RawStatement, idx: int, val: pointer, name: cstring, free: SqliteDestroctor): ResultCode {.importc.}
 proc sqlite3_bind_zeroblob64*(st: ptr RawStatement, idx: int, len: int): ResultCode {.importc.}
 proc sqlite3_changes*(st: ptr RawDatabase): int {.importc.}
+proc sqlite3_last_insert_rowid*(st: ptr RawDatabase): int {.importc.}
 proc sqlite3_column_type*(st: ptr RawStatement, idx: int): SqliteDateType {.importc.}
 proc sqlite3_column_blob*(st: ptr RawStatement, idx: int): pointer {.importc.}
 proc sqlite3_column_bytes*(st: ptr RawStatement, idx: int): int {.importc.}
@@ -176,6 +177,9 @@ proc initDatabase*(
 proc changes*(st: var Database): int {.genref.} =
   sqlite3_changes st.raw
 
+proc changes*(st: var Statement): int {.genref.} =
+  sqlite3_changes sqlite3_db_handle st.raw
+
 proc initStatement*(db: var Database | var ref Database, sql: string, flags: PrepareFlags = {}): Statement {.genrefnew.} =
   check_sqlite sqlite3_prepare_v3(db.raw, sql, sql.len, flags, addr result.raw, nil)
 
@@ -200,6 +204,12 @@ proc step*(st: var Statement): bool {.genref.} =
   of sr_row: true
   of sr_done: false
   else: raise newSQLiteError(st.raw)
+
+proc last_insert_rowid*(st: var Database): int {.genref.} =
+  sqlite3_last_insert_rowid(st.raw)
+
+proc last_insert_rowid*(st: var Statement): int {.genref.} =
+  sqlite3_last_insert_rowid(sqlite3_db_handle st.raw)
 
 proc withColumnBlob*(st: var Statement, idx: int, recv: proc(vm: openarray[byte])) {.genref.} =
   let p = sqlite3_column_blob(st.raw, idx)
