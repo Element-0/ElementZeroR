@@ -48,9 +48,6 @@ type ResultCode* {.pure.} = enum
 
 type SQLiteError* = object of IOError
 
-proc newSQLiteError(code: ResultCode): ref SQLiteError =
-  newException(SQLiteError, $code)
-
 type SQLiteBlob* = object
   raw: ptr UncheckedArray[byte]
   len: int
@@ -112,6 +109,9 @@ type SqliteDateType* = enum
   dt_null = 5
 
 {.push dynlib: sqlite3dll.}
+proc sqlite3_errmsg*(db: ptr RawDatabase): cstring {.importc.}
+proc sqlite3_errstr*(code: ResultCode): cstring {.importc.}
+proc sqlite3_db_handle*(st: ptr RawStatement): ptr RawDatabase {.importc.}
 proc sqlite3_open_v2*(filename: cstring, db: ptr ptr RawDatabase, flags: OpenFlags, vfs: cstring): ResultCode {.importc.}
 proc sqlite3_close_v2*(db: ptr RawDatabase): ResultCode {.importc.}
 proc sqlite3_prepare_v3*(db: ptr RawDatabase, sql: cstring, nbyte: int, flags: PrepareFlags, pstmt: ptr ptr RawStatement, tail: ptr cstring): ResultCode {.importc.}
@@ -135,10 +135,24 @@ proc sqlite3_column_text*(st: ptr RawStatement, idx: int): cstring {.importc.}
 proc sqlite3_column_value*(st: ptr RawStatement, idx: int): ptr RawValue {.importc.}
 {.pop.}
 
+proc newSQLiteError*(code: ResultCode): ref SQLiteError =
+  newException(SQLiteError, $sqlite3_errstr code)
+
+proc newSQLiteError*(db: ptr RawDatabase): ref SQLiteError =
+  newException(SQLiteError, $sqlite3_errmsg db)
+
+proc newSQLiteError*(db: ptr RawStatement): ref SQLiteError =
+  newException(SQLiteError, $sqlite3_errmsg sqlite3_db_handle db)
+
 template check_sqlite(res: ResultCode) =
   let tmp = res
   if tmp != sr_ok:
     raise newSQLiteError tmp
+
+template check_sqlite_stmt(st: ptr RawStatement, res: ResultCode) =
+  let tmp = res
+  if tmp != sr_ok:
+    raise newSQLiteError st
 
 proc `=destroy`*(db: var Database) =
   if db.raw != nil:
@@ -166,26 +180,26 @@ proc initStatement*(db: var Database | var ref Database, sql: string, flags: Pre
   check_sqlite sqlite3_prepare_v3(db.raw, sql, sql.len, flags, addr result.raw, nil)
 
 proc `[]=`*(st: var Statement, idx: int, blob: openarray[byte]) {.genref.} =
-  check_sqlite sqlite3_bind_blob64(st.raw, idx, blob.unsafeAddr, blob.len, TransientDestructor)
+  st.raw.check_sqlite_stmt sqlite3_bind_blob64(st.raw, idx, blob.unsafeAddr, blob.len, TransientDestructor)
 
 proc `[]=`*(st: var Statement, idx: int, val: SomeFloat) {.genref.} =
-  check_sqlite sqlite3_bind_double(st.raw, idx, float64 val)
+  st.raw.check_sqlite_stmt sqlite3_bind_double(st.raw, idx, float64 val)
 
 proc `[]=`*(st: var Statement, idx: int, val: SomeOrdinal) {.genref.} =
-  check_sqlite sqlite3_bind_int64(st.raw, idx, cast[int64](val))
+  st.raw.check_sqlite_stmt sqlite3_bind_int64(st.raw, idx, cast[int64](val))
 
 proc `[]=`*(st: var Statement, idx: int, val: type(nil)) {.genref.} =
-  check_sqlite sqlite3_bind_null(st.raw, idx)
+  st.raw.check_sqlite_stmt sqlite3_bind_null(st.raw, idx)
 
 proc `[]=`*(st: var Statement, idx: int, val: string) {.genref.} =
-  check_sqlite sqlite3_bind_text64(st.raw, idx, val, val.len, TransientDestructor, enc_utf8)
+  st.raw.check_sqlite_stmt sqlite3_bind_text64(st.raw, idx, val, val.len, TransientDestructor, enc_utf8)
 
 proc step*(st: var Statement): bool {.genref.} =
   let res = sqlite3_step(st.raw)
   case res:
   of sr_row: true
   of sr_done: false
-  else: raise newSQLiteError(res)
+  else: raise newSQLiteError(st.raw)
 
 proc withColumnBlob*(st: var Statement, idx: int, recv: proc(vm: openarray[byte])) {.genref.} =
   let p = sqlite3_column_blob(st.raw, idx)
