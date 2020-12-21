@@ -4,6 +4,7 @@ import options
 import winim/mean
 
 import dia2
+import symhash
 
 import ../sqlite3/sqlutils
 
@@ -17,8 +18,8 @@ proc parsePrint(target: string) =
   for symbol in global.findChildren(SymTagPublicSymbol):
     echo "symbol: ", symbol.virtualAddress.toHex, "=", symbol.name
 
-proc create_table() {.importdb: "CREATE TABLE IF NOT EXISTS symbols (symbol TEXT PRIMARY KEY, address INTEGER) WITHOUT ROWID".}
-proc insert_symbol(symbol: string, address: int) {.importdb: "REPLACE INTO symbols VALUES ($symbol, $address)".}
+proc create_table() {.importdb: "CREATE TABLE IF NOT EXISTS symbols_hash (symbol INTEGER PRIMARY KEY, address INTEGER) WITHOUT ROWID".}
+proc insert_symbol(symbol: int64, address: int) {.importdb: "REPLACE INTO symbols_hash VALUES ($symbol, $address)".}
 
 proc parseSave(target: string, db: string) =
   var source = createDataSource()
@@ -28,7 +29,7 @@ proc parseSave(target: string, db: string) =
   db[].create_table()
   var tran = db.initTransaction()
   for symbol in global.findChildren(SymTagPublicSymbol):
-    db[].insert_symbol(symbol.name, symbol.virtualAddress)
+    db[].insert_symbol(symhash(symbol.name), symbol.virtualAddress)
   tran.commit()
 
 proc writeHelp() =
