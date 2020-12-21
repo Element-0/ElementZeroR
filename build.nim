@@ -123,7 +123,7 @@ target "dist" / "chakra.dll":
     absolute target
     absolute cache
     withDir "src":
-      nimExec target, cache, main, "--app:lib"
+      nimExec target, cache, main, "--app:lib -d:chakra"
 
 template downloadTask(basename, filename, field: string) =
   target basename / filename:
