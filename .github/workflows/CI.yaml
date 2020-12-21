@@ -41,7 +41,7 @@ jobs:
       - name: Build pdbparser
         run: nimake build -v:5 pdbparser
       - name: Parse bedrock_server.pdb and generate database
-        run:
+        run: |
           cd dist
           echo "::group::Downloading"
           curl.exe -#Lo bedrock_server.zip https://minecraft.azureedge.net/bin-win/bedrock-server-${{ env.bds_version }}.zip
