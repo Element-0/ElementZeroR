@@ -1,6 +1,6 @@
 import unittest
 import sugar
-import interop/[vector, string]
+import interop/[cppvec, cppstr]
 
 {.compile:"test.cpp".}
 

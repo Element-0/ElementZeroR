@@ -1,5 +1,5 @@
 import unittest
-import interop/string
+import interop/cppstr
 
 {.compile:"test.cpp".}
 
