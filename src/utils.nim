@@ -67,3 +67,14 @@ template addTree*(src: NimNode, kind: NimNodeKind, local, body: untyped) =
   var local {.gensym.} = kind.newNimNode()
   body
   src.add local
+
+proc getNimIdent*(src: NimNode): string =
+  case src.kind:
+  of nnkIdent:
+    return src.strVal
+  of nnkPostfix:
+    src[0].expectIdent "*"
+    src[1].expectKind nnkIdent
+    return src[1].strVal
+  else:
+    error("Not an ident node")
