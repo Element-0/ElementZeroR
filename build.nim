@@ -164,6 +164,7 @@ target "chakra":
   fake = true
   dep "chakra-core"
   dep "dist" / "chakra.dll"
+  dep "dist" / "funchook.dll"
   receipt: discard
 
 downloadTask("dist", "msdia140.dll", "MSDiaSDK")
@@ -240,6 +241,24 @@ target "sqlite3":
   fake = true
   main = "dist" / "sqlite3.dll"
   receipt: discard
+
+target tmpdir / "FuncHook" / "CMakeCache.txt":
+  main = "deps" / "funchook" / "CMakeLists.txt"
+  receipt:
+    let tgt = tmpdir / "FuncHook"
+    let src = "deps" / "funchook"
+    exec &"cmake -B {tgt} {src}"
+
+target tmpdir / "FuncHook" / "MinSizeRel" / "funchook.dll":
+  main = tmpdir / "FuncHook" / "CMakeCache.txt"
+  receipt:
+    withDir tmpdir / "FuncHook":
+      exec "cmake --build . --config MinSizeRel"
+
+target "dist" / "funchook.dll":
+  main = tmpdir / "FuncHook" / "MinSizeRel" / "funchook.dll"
+  receipt:
+    cp(main, target)
 
 default "chakra"
 
