@@ -72,7 +72,8 @@ proc testtargets(subname: string, subfolder: string, deps, extra, external: open
 
 testtargets("C++ Interop", "interop", ["tcppstr", "tcppvector"], ["test.cpp"], [])
 testtargets("NT Internal API", "ntapi", ["ttransaction"], [], [])
-testtargets("SQLIte3", "sqlite3", ["basic", "tmacro"], [], ["dist" / "sqlite3.dll", "src" / "sqlite3" / "*.nim"])
+testtargets("SQLite3", "sqlite3", ["basic", "tmacro"], [], ["dist" / "sqlite3.dll", "src" / "sqlite3" / "*.nim"])
+testtargets("FuncHook", "funchook", ["simple"], [], ["dist" / "funchook.dll", "src" / "funchook" / "*.nim"])
 
 target "test":
   fake = true
