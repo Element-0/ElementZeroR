@@ -6,6 +6,7 @@ import interop/cppstr
 
 import sqlite3/sqlutils
 import pdbparser/symhash
+import funchook/funchook
 
 proc selectSymbol(hash: int64): tuple[address: int] {.importdb: "SELECT address FROM symbols_hash WHERE symbol=$hash".}
 
@@ -21,5 +22,11 @@ proc findSymbol*(symbol: static string, T: typedesc): T =
     quit "Symbol '" & symbol & "' not found!"
 
 let getver = findSymbol("?getServerVersionString@Common@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ", proc (): CppString {.cdecl.})
+
+var ctx = initFuncHook()
+var orig: proc (): CppString {.cdecl.}
+orig = ctx.hook(getver) do () -> CppString {.cdecl.}:
+  return $orig() & " with EZR"
+ctx.install()
 
 echo getver()
