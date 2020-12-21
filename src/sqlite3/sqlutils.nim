@@ -217,7 +217,7 @@ proc initTransaction*(db: var Database): Transaction[ptr Database] {.genrefnew.}
   result.origin = addr db
   result.done = false
 
-proc initTransaction*(db: var ref Database): Transaction[ref Database] {.genrefnew.} =
+proc initTransaction*(db: ref Database): Transaction[ref Database] {.genrefnew.} =
   db.exec "BEGIN"
   result.origin = db
   result.done = false

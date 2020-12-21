@@ -25,7 +25,7 @@ template ptrMath*(body: untyped) =
   body
 
 proc refVar(n: NimNode): NimNode =
-  if n.kind == nnkVarTy: nnkVarTy.newTree nnkRefTy.newTree n[0] else: nnkRefTy.newTree n
+  if n.kind == nnkVarTy: nnkRefTy.newTree n[0] else: nnkRefTy.newTree n
 
 macro genref*(body: untyped): untyped =
   # body.expectKind nnkProcDef

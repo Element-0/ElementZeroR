@@ -187,7 +187,7 @@ proc changes*(st: var Database): int {.genref.} =
 proc changes*(st: var Statement): int {.genref.} =
   sqlite3_changes sqlite3_db_handle st.raw
 
-proc initStatement*(db: var Database | var ref Database, sql: string, flags: PrepareFlags = {}): Statement {.genrefnew.} =
+proc initStatement*(db: var Database | ref Database, sql: string, flags: PrepareFlags = {}): Statement {.genrefnew.} =
   check_sqlite sqlite3_prepare_v3(db.raw, sql, sql.len, flags, addr result.raw, nil)
 
 proc fetchStatement*(db: var Database, sql: string): ref Statement {.genref.} =
