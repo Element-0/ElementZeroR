@@ -31,15 +31,15 @@ jobs:
           nimble.exe install winim
           Write-Output "::endgroup::"
       - name: Dump targets
-        run: nimake.exe dump
+        run: nimake dump
       - name: Build sqlite3
-        run: nimake.exe build -v:5 sqlite3
+        run: nimake build -v:5 sqlite3
       - name: Run tests
-        run: nimake.exe build -v:5 test
+        run: nimake build -v:5 test
       - name: Build default target
-        run: nimake.exe build -v:5
+        run: nimake build -v:5
       - name: Build pdbparser
-        run: nimake.exe build -v:5 pdbparser
+        run: nimake build -v:5 pdbparser
       - name: Parse bedrock_server.pdb and generate database
         run: |
           Set-Location dist
