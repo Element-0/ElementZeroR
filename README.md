@@ -4,7 +4,7 @@ STATE: WIP
 
 ### What's working for now?
 
-1. Injected to bedrock_server.exe and print `hooked`
+1. Injected to bedrock_server.exe and hooked the version function
 
 ## Build Environment
 
