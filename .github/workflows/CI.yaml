@@ -21,37 +21,37 @@ jobs:
         uses: jiro4989/setup-nim-action@v1
       - name: Install dependencies
         run: |
-          echo "::group::Refresh nimble database"
-          nimble refresh
-          echo "::endgroup::"
-          echo "::group::Install nimake"
-          nimble install https://github.com/codehz/nimake@#v0.4.6
-          echo "::endgroup::"
-          echo "::group::Install winim"
-          nimble install winim
-          echo "::endgroup::"
+          Write-Output "::group::Refresh nimble database"
+          nimble.exe refresh
+          Write-Output "::endgroup::"
+          Write-Output "::group::Install nimake"
+          nimble.exe install https://github.com/codehz/nimake@#v0.4.6
+          Write-Output "::endgroup::"
+          Write-Output "::group::Install winim"
+          nimble.exe install winim
+          Write-Output "::endgroup::"
       - name: Dump targets
-        run: nimake dump
+        run: nimake.exe dump
       - name: Build sqlite3
-        run: nimake build -v:5 sqlite3
+        run: nimake.exe build -v:5 sqlite3
       - name: Run tests
-        run: nimake build -v:5 test
+        run: nimake.exe build -v:5 test
       - name: Build default target
-        run: nimake build -v:5
+        run: nimake.exe build -v:5
       - name: Build pdbparser
-        run: nimake build -v:5 pdbparser
+        run: nimake.exe build -v:5 pdbparser
       - name: Parse bedrock_server.pdb and generate database
         run: |
-          cd dist
-          echo "::group::Downloading"
+          Set-Location dist
+          Write-Output "::group::Downloading"
           curl.exe -#Lo bedrock_server.zip https://minecraft.azureedge.net/bin-win/bedrock-server-${{ env.bds_version }}.zip
-          echo "::endgroup::"
-          echo "::group::Extracting"
+          Write-Output "::endgroup::"
+          Write-Output "::group::Extracting"
           tar.exe xf bedrock_server.zip bedrock_server.pdb
-          echo "::endgroup::"
-          echo "::group::Parsing"
+          Write-Output "::endgroup::"
+          Write-Output "::group::Parsing"
           .\pdbparser.exe bedrock_server.pdb --database:bedrock_server.db
-          echo "::endgroup::"
-          echo "::group::Database info"
+          Write-Output "::endgroup::"
+          Write-Output "::group::Database info"
           Get-ItemProperty bedrock_server.db | Format-List
-          echo "::endgroup::"
+          Write-Output "::endgroup::"
