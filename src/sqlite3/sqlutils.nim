@@ -138,7 +138,7 @@ proc genQueryProcedure(sql: string, body, tupdef: NimNode, opt: static bool): Ni
           )
         else:
           elsebody.add nnkRaiseStmt.newTree(
-            nnkCall.newTree(bindSym "newException", bindSym "SQLiteError", newLit "Element not found")
+            nnkCall.newTree(bindSym "newException", ident "SQLiteError", newLit "Element not found")
           )
 proc genUpdateProcedure(sql: string, body: NimNode): NimNode =
   result = body.copy()
