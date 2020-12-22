@@ -261,6 +261,18 @@ target "dist" / "funchook.dll":
   receipt:
     cp(main, target)
 
+target "dist" / "demomod.dll":
+  dep "dist"
+  generateNimSource("src" / "chakra" / "demomod", "demo"):
+    pattern "*.nim"
+  depIt: walkPattern "src" / "chakra" / "*.nim"
+  receipt:
+    absolute main
+    absolute target
+    absolute cache
+    withDir "src":
+      nimExec target, cache, main, &"--app:lib"
+
 default "chakra"
 
 handleCLI()
