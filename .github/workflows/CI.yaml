@@ -27,7 +27,7 @@ jobs:
           nimble.exe refresh
           Write-Output "::endgroup::"
           Write-Output "::group::Install nimake"
-          nimble.exe install https://github.com/codehz/nimake@#v0.4.6
+          nimble.exe install https://github.com/codehz/nimake@#v0.5.0
           Write-Output "::endgroup::"
           Write-Output "::group::Install winim"
           nimble.exe install winim
@@ -35,15 +35,15 @@ jobs:
       - name: Dump targets
         run: nimake dump
       - name: Build sqlite3
-        run: nimake build -v:5 sqlite3
+        run: nimake build -v:5 --colors:on sqlite3
       - name: Run tests
-        run: nimake build -v:5 test
+        run: nimake build -v:5 --colors:on test
       - name: Build default target
-        run: nimake build -v:5
+        run: nimake build -v:5 --colors:on
       - name: Build pdbparser
-        run: nimake build -v:5 pdbparser
+        run: nimake build -v:5 --colors:on pdbparser
       - name: Build demomod
-        run: nimake build -v:5 dist\demomod.dll
+        run: nimake build -v:5 --colors:on dist\demomod.dll
       - name: Parse bedrock_server.pdb and generate database
         run: |
           Set-Location dist
