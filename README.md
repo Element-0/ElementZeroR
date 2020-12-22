@@ -1,4 +1,4 @@
-# ElementZero Redesigned
+# ElementZero reimagined
 
 STATE: WIP
 
