@@ -71,7 +71,7 @@ jobs:
           Write-Output "::endgroup::"
           Write-Output "::group::Executing"
           $out = & .\bedrock_server.exe 2>&1
-          if ($out.GetType(),Name -eq "ErrorRecord") {
+          if ($out.GetType().Name -eq "ErrorRecord") {
             if ($out.CategoryInfo.TargetName -eq "EXPECTED QUIT FOR TESTING") {
               Write-Output "Got expected output"
               Write-Output "::endgroup::"
