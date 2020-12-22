@@ -33,7 +33,7 @@ jobs:
           nimble.exe install winim
           Write-Output "::endgroup::"
       - name: Dump targets
-        run: nimake dump
+        run: nimake dump --colors:on
       - name: Build sqlite3
         run: nimake build -v:5 --colors:on sqlite3
       - name: Run tests
