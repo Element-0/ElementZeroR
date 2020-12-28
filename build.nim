@@ -284,6 +284,18 @@ target "dist" / "demomod.dll":
     withDir "src":
       nimExec target, cache, main, "--app:lib"
 
+target "dist" / "ezmgr.exe":
+  dep "dist"
+  generateNimSource("src" / "ezmgr", "config"):
+    pattern "*.nim"
+  depIt: walkPattern "src" / "xmlcfg" / "*.nim"
+  receipt:
+    absolute main
+    absolute target
+    absolute cache
+    withDir "src":
+      nimExec target, cache, main, "--app:console -d:debug_parsexml"
+
 default "chakra"
 
 handleCLI()
