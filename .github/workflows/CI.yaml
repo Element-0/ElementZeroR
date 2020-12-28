@@ -29,8 +29,8 @@ jobs:
           Write-Output "::group::Install nimake"
           nimble.exe install https://github.com/codehz/nimake@#v0.5.0
           Write-Output "::endgroup::"
-          Write-Output "::group::Install winim"
-          nimble.exe install winim
+          Write-Output "::group::Install winim vtable xmlio"
+          nimble.exe install winim vtable xmlio
           Write-Output "::endgroup::"
       - name: Dump targets
         run: nimake dump --colors:on
