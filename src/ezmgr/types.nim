@@ -3,13 +3,11 @@ import strutils, sugar, strscans, asyncfutures
 import xmlio
 import vtable
 
-import xmlsupport
-
 import ../common/version_code
 
 registerTypeId VersionCode, "1dd35952-3e97-48d2-aefa-112b305ebd92"
 
-buildTypedAttributeHandler VersionCode, parseVersionCode
+buildTypedAttributeHandler parseVersionCode
 
 type ModReference* = object
   name*: string
@@ -45,7 +43,7 @@ proc parseModReference(str: string): ModReference =
 
 registerTypeId seq[ModReference], "bd77a8a3-71ef-400d-9557-7ef77a150f10"
 
-buildTypedAttributeHandler(seq[ModReference]) do(str: string) -> seq[ModReference]:
+buildTypedAttributeHandler do(str: string) -> seq[ModReference]:
   collect(newSeq):
     for item in split(str, ';'):
       parseModReference(item)
@@ -56,21 +54,18 @@ trait ModSource:
 
 registerTypeId(ref ModSource, "c9667691-1654-483d-afda-78c8c47abc66")
 
-type ModInfo* = object of RootObj
-  name*: string
-  description*: string
-  author*: string
-  homepage*: string
-  license*: string
-  dependencies*: seq[ModReference]
-  optionalDependencies*: seq[ModReference]
-  sources*: seq[ref ModSource]
-
-generateXmlElementHandler ModInfo, "e20364bd-ca4c-465e-8f93-34870b34ca5f":
-  checkField name, "is empty": self.name == ""
-  checkField author, "is empty": self.author == ""
-  checkField license, "is empty": self.license == ""
-  checkField sources, "is empty": self.sources.len == 0
+declareXmlElement:
+  type ModInfo* {.
+      id: "259e9a5d-e9fa-4a9f-9b77-7971adf4b152",
+      children: sources.} = object of RootObj
+    name* {.check(value == "", r"name is required").}: string
+    description*: string
+    author* {.check(value == "", r"author is required").}: string
+    homepage*: string
+    license* {.check(value == "", r"license is required").}: string
+    dependencies*: seq[ModReference]
+    optionalDependencies*: seq[ModReference]
+    sources* {.check(value.len == 0, r"sources is required").}: seq[ref ModSource]
 
 trait ModRepository:
   method fetchModList*(self: ref ModRepository): Future[seq[ref ModInfo]]

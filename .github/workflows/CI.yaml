@@ -30,7 +30,7 @@ jobs:
           nimble.exe install https://github.com/codehz/nimake@#v0.5.0
           Write-Output "::endgroup::"
           Write-Output "::group::Install winim vtable xmlio"
-          nimble.exe install winim vtable xmlio
+          nimble.exe install winim vtable@0.3.2 xmlio@0.1.9
           Write-Output "::endgroup::"
       - name: Dump targets
         run: nimake dump --colors:on
@@ -44,6 +44,8 @@ jobs:
         run: nimake build -v:5 --colors:on pdbparser
       - name: Build demomod
         run: nimake build -v:5 --colors:on dist\demomod.dll
+      - name: Build ezmgr
+        run: nimake build -v:5 --colors:on dist\ezmgr.exe
       - name: Parse bedrock_server.pdb and generate database
         run: |
           Set-Location dist
@@ -62,6 +64,9 @@ jobs:
       - name: Testing demomod
         run: |
           Set-Location dist
+          Write-Output "::group::Test ezmgr (temp)"
+          .\ezmgr.exe
+          Write-Output "::endgroup::"
           Write-Output "::group::Preparing"
           New-Item -ItemType directory -Path mods\demo
           Copy-Item -Path demomod.dll -Destination mods\demo\demomod.dll

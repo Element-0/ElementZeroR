@@ -1,5 +1,6 @@
 import tables, strutils, dynlib, strscans
 import xmlio
+import xmlio/typeid_default
 import vtable
 
 type ConfigXmlRegistry = object of RootObj

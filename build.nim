@@ -9,6 +9,9 @@ const depinc = "deps" / "include"
 const cfgfile = "config.inf"
 let cfg = loadConfig cfgfile
 
+template updateVersion(file, version: string) =
+  exec "rcedit " & file & " --set-file-version " & version
+
 var testscategories: seq[string]
 
 proc testtargets(subname: string, subfolder: string, deps, extra, external: openarray[string]) =
@@ -283,6 +286,7 @@ target "dist" / "demomod.dll":
     absolute cache
     withDir "src":
       nimExec target, cache, main, "--app:lib"
+    updateVersion target, "0.0.1.0"
 
 target "dist" / "ezmgr.exe":
   dep "dist"
@@ -294,7 +298,7 @@ target "dist" / "ezmgr.exe":
     absolute target
     absolute cache
     withDir "src":
-      nimExec target, cache, main, "--app:console -d:debug_parsexml"
+      nimExec target, cache, main, "--app:console"
 
 default "chakra"
 

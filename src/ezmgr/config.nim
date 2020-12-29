@@ -1,44 +1,54 @@
 import streams, os, asyncdispatch
 
+import winim/inc/winver
+import winim/winstr
+
 import types
 
 import xmlio
 import vtable
 
-import xmlsupport
 import ../xmlcfg/xmlcfg
 
-type Repositories* = object of RootObj
-  children*: seq[ref ModRepository]
-
-generateXmlElementHandler Repositories, "280c836f-b65f-4b20-91d3-192e407d4beb":
-  discard
+declareXmlElement:
+  type Repositories* {.id: "79eeea4c-9b53-4ad8-9761-3649025b6c7f".} = object of RootObj
+    children*: seq[ref ModRepository]
 
 iterator items*(repo: ref Repositories): ref ModRepository =
   for item in repo.children:
     yield item
 
-type InlineRepository* = object of RootObj
-  children: seq[ref ModInfo]
-
-generateXmlElementHandler InlineRepository, "735a4e32-f58e-4871-b5b9-d3267583d9f1":
-  discard
+declareXmlElement:
+  type InlineRepository* {.id: "735a4e32-f58e-4871-b5b9-d3267583d9f1".} = object of RootObj
+    children: seq[ref ModInfo]
 
 impl InlineRepository, ModRepository:
   method fetchModList*(self: ref InlineRepository): Future[seq[ref ModInfo]] {.async.} =
     return self.children
 
-type InlineFile = object of RootObj
-  path: string
+proc checkFile(value: string): bool = value == "" or (not fileExists value)
+
+declareXmlElement:
+  type InlineFile {.id: "ab1d5779-c842-4ecd-b0f7-a8d0725f7b16".} = object of RootObj
+    path {.check(checkFile(value), r"invalid path").}: string
 
 impl InlineFile, ModSource:
-  method checkVersion*(self: ref InlineFile): Future[seq[int64]] =
+  method checkVersion*(self: ref InlineFile): Future[seq[int64]] {.async.} =
+    var size: int32
+    var verhandler: int32
+    size = GetFileVersionInfoSize(self.path, addr verhandler)
+    if size == 0:
+      return @[0i64]
+    var buffer = newSeq[byte](size)
+    GetFileVersionInfo(self.path, verhandler, size, addr buffer[0])
+    var fixed: ptr VS_FIXEDFILEINFO
+    size = int32 sizeof(VS_FIXEDFILEINFO)
+    VerQueryValue(addr buffer[0], r"\", cast[ptr pointer](addr fixed), addr size)
+    var ver = (int64 fixed.dwFileVersionMS) shl 32
+    ver += int64 fixed.dwFileVersionLS
+    return @[ver]
+  method fetchFile*(self: ref InlineFile, version: int64): Future[string] {.async.} =
     discard
-  method fetchFile*(self: ref InlineFile, version: int64): Future[string] =
-    discard
-
-generateXmlElementHandler InlineFile, "b7ff682e-05d8-4a73-a7d5-1e8f144c7137":
-  checkField path, "is invalid": self.path == "" or (not fileExists self.path)
 
 let stdns* = newSimpleXmlnsHandler()
 stdns.registerType("repositories", ref Repositories)
@@ -55,5 +65,7 @@ proc entry(filename: string) {.async.} =
     let list = await repo.fetchModList()
     for item in list:
       echo item[]
+      for src in item.sources:
+        echo await src.checkVersion()
 
 waitFor entry("ezmgr.xml")
