@@ -30,7 +30,7 @@ jobs:
           nimble.exe install https://github.com/codehz/nimake@#v0.5.0
           Write-Output "::endgroup::"
           Write-Output "::group::Install winim vtable xmlio"
-          nimble.exe install winim vtable@0.3.2 xmlio@0.1.9
+          nimble.exe install -y winim vtable@0.3.2 xmlio@0.1.9
           Write-Output "::endgroup::"
       - name: Dump targets
         run: nimake dump --colors:on
