@@ -50,7 +50,7 @@ impl InlineFile, ModSource:
   method fetchFile*(self: ref InlineFile, version: int64): Future[string] {.async.} =
     discard
 
-let stdns* = newSimpleXmlnsHandler()
+let stdns* = new SimpleXmlnsHandler
 stdns.registerType("repositories", ref Repositories)
 stdns.registerType("mod", ref ModInfo)
 stdns.registerType("file", ref InlineFile, ref ModSource)

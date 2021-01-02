@@ -1,0 +1,1 @@
+module({name: "Ez.Project", projects: [f`./Ez.Project.dsc`]});

@@ -1,8 +1,11 @@
 .nimakefiles
+Out
 dist
+dist2
 pkgs
 deps/lib
 *.exe
 *.dll
 *.lib
 *.pdb
+buildx.bat
