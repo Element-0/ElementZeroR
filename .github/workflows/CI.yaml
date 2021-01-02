@@ -6,9 +6,9 @@ env:
 
 on:
   push:
-    branches: [ 💥 ]
+    branches: [💥]
   pull_request:
-    branches: [ 💥 ]
+    branches: [💥]
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          submodules: 'recursive'
+          submodules: "recursive"
       - name: Download rcedit.exe
         uses: robinraju/release-downloader@v1
         with:
@@ -50,13 +50,14 @@ jobs:
         uses: carlosperate/download-file-action@v1.0.3
         id: download-buildxl
         with:
-          file-url: 'https://dl.lumito.net/public/projects/BuildXL/0.1.0/msi/20201107.0/BuildXL.Setup.0.1.0-20201107.0.msi'
-          file-name: 'BuildXL.Setup.msi'
+          file-url: "https://dl.lumito.net/public/projects/BuildXL/0.1.0/msi/20201107.0/BuildXL.Setup.0.1.0-20201107.0.msi"
+          file-name: "BuildXL.Setup.msi"
           location: ${{ runner.tool_cache }}
       - name: Install BuildXL
         run: |
           Write-Output "::group::Run msiexec"
-          msiexec /i ${{ steps.download-buildxl.outputs.file-path }} /qn
+          $arguments = "/i ${{ steps.download-buildxl.outputs.file-path }} /qn"
+          Start-Process msiexec.exe -ArgumentList $arguments -Wait
           Write-Output "::endgroup::"
           Write-Output "::group::Setting environment variables"
           echo "C:\Program Files\BuildXL\" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
