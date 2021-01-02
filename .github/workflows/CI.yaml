@@ -55,6 +55,9 @@ jobs:
           location: ${{ runner.tool_cache }}
       - name: Install BuildXL
         run: |
+          Write-Output "::group::Try fix ntfs journal"
+          fsutil usn createjournal m=0x20000000 a=0x8000000 D:
+          Write-Output "::endgroup::"
           Write-Output "::group::Run msiexec"
           $arguments = "/i ${{ steps.download-buildxl.outputs.file-path }} /qn"
           Start-Process msiexec.exe -ArgumentList $arguments -Wait
@@ -68,4 +71,5 @@ jobs:
           Write-Output "::endgroup::"
       - name: Run BuildXL
         run: |
+
           bxl /c:config.dsc
