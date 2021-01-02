@@ -48,6 +48,27 @@ namespace Runner.ClangCl {
             tool: args.tool || clangClTool,
             tempDirectory: tmp,
             allowUndeclaredSourceReads: true,
+            unsafe: {
+                passThroughEnvironmentVariables: [
+                    "VSINSTALLDIR",
+                    "VCINSTALLDIR",
+                    "WindowsSDKLibVersion",
+                    "WindowsSDKVersion",
+                    "VisualStudioVersion",
+                    "VS160COMNTOOLS",
+                    "VCToolsRedistDir",
+                    "VSCMD_ARG_HOST_ARCH",
+                    "UCRTVersion",
+                    "VCToolsVersion",
+                    "VCIDEInstallDir",
+                    "WindowsLibPath",
+                    "VSCMD_ARG_TGT_ARCH",
+                    "LIB",
+                    "INCLUDE",
+                    "WindowsSdkDir",
+                    "VCToolsInstallDir",
+                ]
+            },
             arguments: [
                 ...args.arguments,
                 ...mapType(args.type),
