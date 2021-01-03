@@ -51,7 +51,7 @@ jobs:
           path: C:\Program Files\BuildXL\
           key: ${{ env.buildxl_url }}
       - name: Download BuildXL
-        uses: carlosperate/download-file-action@v1.0.
+        uses: carlosperate/download-file-action@v1.0.3
         if: steps.cache-buildxl.outputs.cache-hit != 'true'
         id: download-buildxl
         with:
