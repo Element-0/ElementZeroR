@@ -1,3 +1,0 @@
-[submodule "deps/funchook"]
-	path = deps/funchook
-	url = https://github.com/kubo/funchook
