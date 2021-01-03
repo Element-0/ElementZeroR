@@ -41,7 +41,7 @@ jobs:
           nimble.exe refresh
           Write-Output "::endgroup::"
           Write-Output "::group::Install winim vtable xmlio"
-          nimble.exe install -y winim vtable@0.3.2 xmlio@0.1.9
+          nimble.exe install -y winim vtable@0.3.3 xmlio@0.2.2
           Write-Output "::endgroup::"
       - name: Download BuildXL
         uses: carlosperate/download-file-action@v1.0.3
