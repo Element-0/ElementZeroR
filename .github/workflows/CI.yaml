@@ -3,6 +3,7 @@ name: CI
 env:
   bds_version: 1.16.201.02
   nim_version: 1.4.2
+  buildxl_url: https://dl.lumito.net/public/projects/BuildXL/0.1.0/msi/20201107.0/BuildXL.Setup.0.1.0-20201107.0.msi
 
 on:
   push:
@@ -43,21 +44,29 @@ jobs:
           Write-Output "::group::Install winim vtable xmlio"
           nimble.exe install -y winim vtable@0.3.3 xmlio@0.2.2
           Write-Output "::endgroup::"
+      - name: Cache BuildXL
+        uses: actions/cache@v2
+        id: cache-buildxl
+        with:
+          path: C:\Program Files\BuildXL\
+          key: ${{ env.buildxl_url }}
       - name: Download BuildXL
-        uses: carlosperate/download-file-action@v1.0.3
+        uses: carlosperate/download-file-action@v1.0.
+        if: steps.cache-buildxl.outputs.cache-hit != 'true'
         id: download-buildxl
         with:
-          file-url: "https://dl.lumito.net/public/projects/BuildXL/0.1.0/msi/20201107.0/BuildXL.Setup.0.1.0-20201107.0.msi"
+          file-url: ${{ env.buildxl_url }}
           file-name: "BuildXL.Setup.msi"
           location: ${{ runner.tool_cache }}
       - name: Install BuildXL
+        if: steps.cache-buildxl.outputs.cache-hit != 'true'
+        run: |
+          $arguments = "/i ${{ steps.download-buildxl.outputs.file-path }} /qn"
+          Start-Process msiexec.exe -ArgumentList $arguments -Wait
+      - name: Setup BuildXL environment
         run: |
           Write-Output "::group::Try fix ntfs journal"
           fsutil usn createjournal m=0x20000000 a=0x8000000 D:
-          Write-Output "::endgroup::"
-          Write-Output "::group::Run msiexec"
-          $arguments = "/i ${{ steps.download-buildxl.outputs.file-path }} /qn"
-          Start-Process msiexec.exe -ArgumentList $arguments -Wait
           Write-Output "::endgroup::"
           Write-Output "::group::Setting environment variables"
           echo "C:\Program Files\BuildXL\" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
