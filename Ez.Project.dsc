@@ -18,7 +18,10 @@ namespace Project {
     export const chakraCorePdbPip = Transformer.copyFile(chakracoref.getFile("x64_release/ChakraCore.pdb"), getFile(r`ChakraCore.pdb`).path, ["chakra_core"]);
     export const sqlite3Pip = Runner.ClangCl.compile({
         type: Runner.ClangCl.TargetType.dll,
-        sources: [sqlite3c],
+        sources: [
+            sqlite3c,
+            f`src/sqlite3/sqlite3init.c`,
+        ],
         target: getFile(r`sqlite3.dll`),
         tags: ["sqlite3"],
 
@@ -63,8 +66,17 @@ namespace Project {
         dependencies: [
             chakraCorePip,
             funchookPip,
+            sqlite3Pip.getOutputFile(getFile(r`sqlite3.dll`).path),
         ],
-        arguments: [Cmd.option("-d:", "chakra")],
+        arguments: [
+            Cmd.option("--gc:", "orc"),
+            Cmd.options("--passC:", ["/MD"]),
+            Cmd.options("-d:", [
+                    "chakra",
+                    "useMalloc",
+                    "noSignalHandler",
+                ]),
+        ],
     });
     export const pdbparserPip = Runner.Nim.compile({
         type: Runner.Nim.ApplicationType.console,
