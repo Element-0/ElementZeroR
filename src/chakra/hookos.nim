@@ -1,15 +1,26 @@
 import macros
 
-import importmc
+import winim/lean
+
 import funchook/funchook
 import utils
 
 import hookctx
+export hookctx
 
-macro hookmc*(sym: static string, body: untyped) =
+proc osmodule(name: static string): HANDLE =
+  let cache {.global.} = GetModuleHandle(name)
+  doAssert cache != 0, "Cannot find moudle: " & name
+  cache
+
+proc osfunc(modname: static string, fnname: static string, T: typedesc): T =
+  result = cast[T](GetProcAddress(osmodule modname, fnname))
+  doAssert result != nil, "Cannot find proc address: " & fnname
+
+macro hookos*(dllname, sym: static string, body: untyped) =
   let xtype = nnkProcTy.newTree(
     body[3].copy(),
-    nnkPragma.newTree(ident "cdecl")
+    body[4].copy()
   )
   let fname = getNimIdent(body[0])
   let origin_id = ident(fname & "_origin")
@@ -20,7 +31,8 @@ macro hookmc*(sym: static string, body: untyped) =
       body[0],
       newEmptyNode(),
       nnkCall.newTree(
-        bindSym "findSymbol",
+        bindSym "osfunc",
+        newLit dllname,
         newLit sym,
         xtype,
       )
@@ -35,9 +47,6 @@ macro hookmc*(sym: static string, body: untyped) =
   )
   let hooked = body.copy()
   hooked[0] = hooked_id
-  hooked[4] = nnkPragma.newTree(
-    ident "cdecl"
-  )
   result.add hooked
   result.add nnkAsgn.newTree(
     origin_id,

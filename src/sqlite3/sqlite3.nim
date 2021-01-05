@@ -155,6 +155,11 @@ template check_sqlite(res: ResultCode) =
   if tmp != sr_ok:
     raise newSQLiteError tmp
 
+template check_sqlite_db(db: ptr RawDatabase, res: ResultCode) =
+  let tmp = res
+  if tmp != sr_ok:
+    raise newSQLiteError db
+
 template check_sqlite_stmt(st: ptr RawStatement, res: ResultCode) =
   let tmp = res
   if tmp != sr_ok:
@@ -188,7 +193,7 @@ proc changes*(st: var Statement): int {.genref.} =
   sqlite3_changes sqlite3_db_handle st.raw
 
 proc initStatement*(db: var Database | ref Database, sql: string, flags: PrepareFlags = {}): Statement {.genrefnew.} =
-  check_sqlite sqlite3_prepare_v3(db.raw, sql, sql.len, flags, addr result.raw, nil)
+  check_sqlite_db db.raw, sqlite3_prepare_v3(db.raw, sql, sql.len, flags, addr result.raw, nil)
 
 proc fetchStatement*(db: var Database, sql: string): ref Statement {.genref.} =
   if sql in db.stmtcache:

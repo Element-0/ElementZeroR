@@ -1,4 +1,4 @@
-import macros
+import macros, os
 import pdbparser/symhash
 
 when defined(chakra):
@@ -7,7 +7,7 @@ when defined(chakra):
 
   proc selectSymbol(hash: int64): tuple[address: int] {.importdb: "SELECT address FROM symbols_hash WHERE symbol=$hash".}
 
-  var symdb = initDatabase "bedrock_server.db"
+  var symdb = initDatabase getAppDir() / "bedrock_server.db"
   var baseaddr = cast[ByteAddress](GetModuleHandle(nil))
 
   proc findSymbolByHash*(hash: int64): ByteAddress {.exportc, dynlib.} =

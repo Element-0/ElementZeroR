@@ -6,8 +6,11 @@ import winim/lean
 
 import interop/cppstr
 
+import private/fsredirect
+
 import importmc
 import hookmc
+import hookctx
 import logger
 
 proc getServerVersionString(): CppString {.hookmc: "?getServerVersionString@Common@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ".} =

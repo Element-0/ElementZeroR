@@ -1,4 +1,3 @@
-
 type LogLevel* {.pure.} = enum
   llvl_debug,
   llvl_info,
