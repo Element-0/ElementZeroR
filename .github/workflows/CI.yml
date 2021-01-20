@@ -17,6 +17,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          repository: Element-0/chakra
       - name: Download rcedit.exe
         uses: robinraju/release-downloader@v1
         with:
@@ -44,5 +46,5 @@ jobs:
           nimble.exe refresh
           Write-Output "::endgroup::"
           Write-Output "::group::Install winim vtable xmlio"
-          nimble.exe install -d ezchakra
+          nimble.exe install -d
           Write-Output "::endgroup::"
