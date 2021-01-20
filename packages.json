@@ -1,0 +1,106 @@
+[
+  {
+    "name": "ezutils",
+    "url": "https://github.com/Element-0/utils.git",
+    "method": "git",
+    "tags": [
+      "ez",
+      "lib"
+    ],
+    "description": "Common code for ElementZero",
+    "license": "LGPL-3.0",
+    "web": "https://github.com/Element-0/utils"
+  },
+  {
+    "name": "cppinterop",
+    "url": "https://github.com/Element-0/cppinterop.git",
+    "method": "git",
+    "tags": [
+      "ez",
+      "lib",
+      "cpp"
+    ],
+    "description": "C++ interop for ElementZero",
+    "license": "LGPL-3.0",
+    "web": "https://github.com/Element-0/cppinterop"
+  },
+  {
+    "name": "ezfunchook",
+    "url": "https://github.com/Element-0/funchook.git",
+    "method": "git",
+    "tags": [
+      "ez",
+      "lib",
+      "funchook"
+    ],
+    "description": "FuncHook for ElementZero",
+    "license": "LGPL-3.0",
+    "web": "https://github.com/Element-0/funchook"
+  },
+  {
+    "name": "ntapi",
+    "url": "https://github.com/Element-0/ntapi.git",
+    "method": "git",
+    "tags": [
+      "ez",
+      "lib",
+      "windows"
+    ],
+    "description": "NTAPI for ElementZero",
+    "license": "LGPL-3.0",
+    "web": "https://github.com/Element-0/ntapi"
+  },
+  {
+    "name": "ezsqlite3",
+    "url": "https://github.com/Element-0/sqlite3.git",
+    "method": "git",
+    "tags": [
+      "ez",
+      "lib",
+      "sqlite3"
+    ],
+    "description": "SQLite3 for ElementZero",
+    "license": "LGPL-3.0",
+    "web": "https://github.com/Element-0/sqlite3"
+  },
+  {
+    "name": "ezxmlcfg",
+    "url": "https://github.com/Element-0/xmlcfg.git",
+    "method": "git",
+    "tags": [
+      "ez",
+      "lib"
+    ],
+    "description": "XMLCFG for ElementZero",
+    "license": "LGPL-3.0",
+    "web": "https://github.com/Element-0/xmlcfg"
+  },
+  {
+    "name": "ezpdbparser",
+    "url": "https://github.com/Element-0/pdbparser.git",
+    "method": "git",
+    "tags": [
+      "ez",
+      "lib",
+      "windows",
+      "bin"
+    ],
+    "description": "PDB Parser for ElementZero",
+    "license": "LGPL-3.0",
+    "web": "https://github.com/Element-0/pdbparser"
+  },
+  {
+    "name": "ezchakra",
+    "url": "https://github.com/Element-0/chakra.git",
+    "method": "git",
+    "tags": [
+      "ez",
+      "lib",
+      "windows",
+      "dll"
+    ],
+    "description": "Chakra Loader for ElementZero",
+    "license": "LGPL-3.0",
+    "web": "https://github.com/Element-0/chakra"
+  }
+]
