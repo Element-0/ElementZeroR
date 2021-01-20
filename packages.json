@@ -4,8 +4,8 @@
     "url": "https://github.com/Element-0/utils.git",
     "method": "git",
     "tags": [
-      "ez",
-      "lib"
+      "elementzero",
+      "ezlib"
     ],
     "description": "Common code for ElementZero",
     "license": "LGPL-3.0",
@@ -16,8 +16,8 @@
     "url": "https://github.com/Element-0/cppinterop.git",
     "method": "git",
     "tags": [
-      "ez",
-      "lib",
+      "elementzero",
+      "ezlib",
       "cpp"
     ],
     "description": "C++ interop for ElementZero",
@@ -29,8 +29,8 @@
     "url": "https://github.com/Element-0/funchook.git",
     "method": "git",
     "tags": [
-      "ez",
-      "lib",
+      "elementzero",
+      "ezlib",
       "funchook"
     ],
     "description": "FuncHook for ElementZero",
@@ -42,8 +42,8 @@
     "url": "https://github.com/Element-0/ntapi.git",
     "method": "git",
     "tags": [
-      "ez",
-      "lib",
+      "elementzero",
+      "ezlib",
       "windows"
     ],
     "description": "NTAPI for ElementZero",
@@ -55,8 +55,8 @@
     "url": "https://github.com/Element-0/sqlite3.git",
     "method": "git",
     "tags": [
-      "ez",
-      "lib",
+      "elementzero",
+      "ezlib",
       "sqlite3"
     ],
     "description": "SQLite3 for ElementZero",
@@ -68,8 +68,8 @@
     "url": "https://github.com/Element-0/xmlcfg.git",
     "method": "git",
     "tags": [
-      "ez",
-      "lib"
+      "elementzero",
+      "ezlib"
     ],
     "description": "XMLCFG for ElementZero",
     "license": "LGPL-3.0",
@@ -80,8 +80,8 @@
     "url": "https://github.com/Element-0/pdbparser.git",
     "method": "git",
     "tags": [
-      "ez",
-      "lib",
+      "elementzero",
+      "ezlib",
       "windows",
       "bin"
     ],
@@ -94,8 +94,8 @@
     "url": "https://github.com/Element-0/chakra.git",
     "method": "git",
     "tags": [
-      "ez",
-      "lib",
+      "elementzero",
+      "ezlib",
       "windows",
       "dll"
     ],
