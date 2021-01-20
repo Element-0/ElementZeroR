@@ -16,10 +16,12 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout main
+        uses: actions/checkout@v2
         with:
           path: main
-      - uses: actions/checkout@v2
+      - name: Checkout chakra
+        uses: actions/checkout@v2
         with:
           repository: Element-0/chakra
           path: chakra
@@ -51,5 +53,7 @@ jobs:
           Start-Process -Wait -NoNewWindow nimble.exe -ArgumentList "refresh"
           Write-Output "::endgroup::"
           Write-Output "::group::Install dependencies"
+          Push-Location chakra
           Start-Process -Wait -NoNewWindow nimble.exe -ArgumentList "install -d"
+          Pop-Location
           Write-Output "::endgroup::"
