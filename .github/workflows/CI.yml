@@ -57,3 +57,8 @@ jobs:
           Start-Process -Wait -NoNewWindow nimble.exe -ArgumentList "install -d"
           Pop-Location
           Write-Output "::endgroup::"
+      - name: Build chakra.dll
+        run: |
+          Push-Location chakra
+          Start-Process -Wait -NoNewWindow nimble.exe -ArgumentList "build_dll"
+          Pop-Location
