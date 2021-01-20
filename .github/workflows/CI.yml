@@ -18,7 +18,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
+          path: main
+      - uses: actions/checkout@v2
+        with:
           repository: Element-0/chakra
+          path: chakra
       - name: Download rcedit.exe
         uses: robinraju/release-downloader@v1
         with:
@@ -38,9 +42,10 @@ jobs:
           nim-version: ${{ env.nim_version }}
       - name: Install dependencies
         run: |
-          $cfg = New-Item -Path (Join-Path $env:APPDATA "nimble\nimble.ini") -Force
-          Write-Output ("::group::Add ElementZero packages source: " + $cfg)
-          Write-Output "[PackageList]" 'name = "ElementZero"' 'url = "https://element-0.win/packages.json"' | Out-File -FilePath $cfg -Encoding utf8 -Append
+          $ini = New-Item -Path (Join-Path $env:APPDATA "nimble\nimble.ini") -Force
+          $json = Resolve-Path main\packages.json
+          Write-Output ("::group::Add ElementZero packages source: " + $json)
+          Write-Output "[PackageList]" 'name = "ElementZero"' "path = r`"$json`"" | Out-File -FilePath $ini -Encoding utf8 -Append
           Write-Output "::endgroup::"
           Write-Output "::group::Refresh nimble database"
           Start-Process -Wait -NoNewWindow nimble.exe -ArgumentList "refresh"
@@ -48,4 +53,3 @@ jobs:
           Write-Output "::group::Install dependencies"
           Start-Process -Wait -NoNewWindow nimble.exe -ArgumentList "install -d"
           Write-Output "::endgroup::"
-      - name: B
