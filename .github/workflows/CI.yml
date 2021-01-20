@@ -43,8 +43,9 @@ jobs:
           Write-Output "[PackageList]" 'name = "ElementZero"' 'url = "https://element-0.win/packages.json"' | Out-File -FilePath $cfg -Encoding utf8 -Append
           Write-Output "::endgroup::"
           Write-Output "::group::Refresh nimble database"
-          nimble.exe refresh
+          Start-Process -Wait -NoNewWindow nimble.exe -ArgumentList "refresh"
           Write-Output "::endgroup::"
-          Write-Output "::group::Install winim vtable xmlio"
-          nimble.exe install -d
+          Write-Output "::group::Install dependencies"
+          Start-Process -Wait -NoNewWindow nimble.exe -ArgumentList "install -d"
           Write-Output "::endgroup::"
+      - name: B
