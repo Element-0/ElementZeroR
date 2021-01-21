@@ -42,7 +42,6 @@ jobs:
           nim-version: ${{ env.nim_version }}
       - name: Install dependencies
         run: |
-          . Invoke-Process.ps1
           $ini = New-Item -Path (Join-Path $env:APPDATA "nimble\nimble.ini") -Force
           $json = Resolve-Path main\packages.json
           Write-Output ("::group::Add ElementZero packages source: " + $json)
@@ -58,7 +57,6 @@ jobs:
           Write-Output "::endgroup::"
       - name: Build chakra.dll
         run: |
-          . Invoke-Process.ps1
           Push-Location chakra
           nimble.exe build_dll
           Pop-Location
