@@ -7,10 +7,8 @@ env:
   nim_version: 1.4.2
 
 on:
-  push:
-    branches: [ 💥 ]
-
-  workflow_dispatch:
+  repository_dispatch:
+    types: [build]
 
 jobs:
   build:
