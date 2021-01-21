@@ -30,6 +30,8 @@ jobs:
           latest: true
           fileName: rcedit-x64.exe
           out-file-path: ${{ runner.tool_cache }}/rcedit
+      - name: Setup PowerShell
+        run: Install-Script -Name Invoke-Process -AcceptLicense -Confirm -Force
       - name: Setup rcedit
         run: |
           Rename-Item ${{ runner.tool_cache }}\rcedit\rcedit-x64.exe ${{ runner.tool_cache }}\rcedit\rcedit.exe
@@ -42,23 +44,25 @@ jobs:
           nim-version: ${{ env.nim_version }}
       - name: Install dependencies
         run: |
+          . Invoke-Process.ps1
           $ini = New-Item -Path (Join-Path $env:APPDATA "nimble\nimble.ini") -Force
           $json = Resolve-Path main\packages.json
           Write-Output ("::group::Add ElementZero packages source: " + $json)
           Write-Output "[PackageList]" 'name = "ElementZero"' "path = r`"$json`"" | Out-File -FilePath $ini -Encoding utf8 -Append
           Write-Output "::endgroup::"
           Write-Output "::group::Refresh nimble database"
-          Start-Process -Wait -NoNewWindow nimble.exe -ArgumentList "refresh"
+          Invoke-Process -Wait -NoNewWindow nimble.exe -ArgumentList "refresh"
           Write-Output "::endgroup::"
           Write-Output "::group::Install dependencies"
           Push-Location chakra
-          Start-Process -Wait -NoNewWindow nimble.exe -ArgumentList "install -d"
+          Invoke-Process -Wait -NoNewWindow nimble.exe -ArgumentList "install -d"
           Pop-Location
           Write-Output "::endgroup::"
       - name: Build chakra.dll
         run: |
+          . Invoke-Process.ps1
           Push-Location chakra
-          Start-Process -Wait -NoNewWindow nimble.exe -ArgumentList "build_dll"
+          Invoke-Process -Wait -NoNewWindow nimble.exe -ArgumentList "build_dll"
           Pop-Location
       - name: Cache BDS
         uses: actions/cache@v2
