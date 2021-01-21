@@ -73,3 +73,8 @@ jobs:
           $url = "https://minecraft.azureedge.net/bin-win/bedrock-server-${{ env.bds_version }}.zip"
           Invoke-WebRequest -OutFile $tmp $url
           $tmp | Expand-Archive -DestinationPath base
+      - name: Generate Symbol Database
+        run: |
+          Push-Location base
+          ezpdbparser.cmd bedrock_server.pdb --database:bedrock_server.db
+          Pop-Location
