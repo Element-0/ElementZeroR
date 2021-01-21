@@ -76,6 +76,18 @@
     "web": "https://github.com/Element-0/xmlcfg"
   },
   {
+    "name": "ezcurl",
+    "url": "https://github.com/Element-0/curl.git",
+    "method": "git",
+    "tags": [
+      "elementzero",
+      "ezlib"
+    ],
+    "description": "Curl bindings for ElementZero",
+    "license": "LGPL-3.0",
+    "web": "https://github.com/Element-0/curl"
+  },
+  {
     "name": "ezpdbparser",
     "url": "https://github.com/Element-0/pdbparser.git",
     "method": "git",
