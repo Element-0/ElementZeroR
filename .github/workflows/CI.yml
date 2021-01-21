@@ -55,10 +55,10 @@ jobs:
           nimble.exe install -d
           Pop-Location
           Write-Output "::endgroup::"
-      - name: Build chakra.dll
+      - name: Build and install chakra.dll
         run: |
           Push-Location chakra
-          nimble.exe build_dll
+          nimble.exe install
           Pop-Location
       - name: Cache BDS
         uses: actions/cache@v2
@@ -85,9 +85,9 @@ jobs:
             Copy-Item $src $dst
             Write-Output "::endgroup::"
           }
-          New-Item -Name "dist" -ItemType "directory"
+          New-Item -Name "dist" -ItemType "directory" | OUt-Null
           Copy-Item-Display base\bedrock_server.db dist\bedrock_server.db
-          $path_chakra = nimble.exe path ezchakra
+          $path_chakra = (nimble.exe path ezchakra).trim()
           Get-ChildItem $path_chakra |
             Where-Object { $_.Extension -in '.dll', '.pdb' } |
             Foreach-Object { Copy-Item-Display $_ (Join-Path "dist\" $_.Name) }
