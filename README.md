@@ -2,7 +2,14 @@
 
 STATE: WIP
 
-# How to build and install
+## Features
+
+1. (Built-in feature) Seprated data folder
+2. (**TODO**) Mod loading and configuation
+3. (**TODO**) Mod and configuation manager (GUI and CLI)
+4. (**TODO**) Remote control interface (WEB)
+
+## How to build and install
 
 0. Prepare bedrock server from official website
 1. Install msvc with clang_cl support
