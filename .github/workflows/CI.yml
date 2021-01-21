@@ -30,10 +30,6 @@ jobs:
           latest: true
           fileName: rcedit-x64.exe
           out-file-path: ${{ runner.tool_cache }}/rcedit
-      - name: Setup PowerShell
-        run: |
-          Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Script Invoke-Process
       - name: Setup rcedit
         run: |
           Rename-Item ${{ runner.tool_cache }}\rcedit\rcedit-x64.exe ${{ runner.tool_cache }}\rcedit\rcedit.exe
@@ -53,18 +49,18 @@ jobs:
           Write-Output "[PackageList]" 'name = "ElementZero"' "path = r`"$json`"" | Out-File -FilePath $ini -Encoding utf8 -Append
           Write-Output "::endgroup::"
           Write-Output "::group::Refresh nimble database"
-          Invoke-Process -Wait -NoNewWindow nimble.exe -ArgumentList "refresh"
+          nimble.exe refresh
           Write-Output "::endgroup::"
           Write-Output "::group::Install dependencies"
           Push-Location chakra
-          Invoke-Process -Wait -NoNewWindow nimble.exe -ArgumentList "install -d"
+          nimble.exe install -d
           Pop-Location
           Write-Output "::endgroup::"
       - name: Build chakra.dll
         run: |
           . Invoke-Process.ps1
           Push-Location chakra
-          Invoke-Process -Wait -NoNewWindow nimble.exe -ArgumentList "build_dll"
+          nimble.exe build_dll
           Pop-Location
       - name: Cache BDS
         uses: actions/cache@v2
