@@ -31,7 +31,7 @@ jobs:
           fileName: rcedit-x64.exe
           out-file-path: ${{ runner.tool_cache }}/rcedit
       - name: Setup PowerShell
-        run: Install-Script -Name Invoke-Process -AcceptLicense -Confirm -Force
+        run: Install-Script -Name Invoke-Process -Confirm
       - name: Setup rcedit
         run: |
           Rename-Item ${{ runner.tool_cache }}\rcedit\rcedit-x64.exe ${{ runner.tool_cache }}\rcedit\rcedit.exe
