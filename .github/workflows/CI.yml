@@ -78,3 +78,21 @@ jobs:
           Push-Location base
           ezpdbparser.cmd bedrock_server.pdb --database:bedrock_server.db
           Pop-Location
+      - name: Create dist
+        run: |
+          function Copy-Item-Display($src, $dst) {
+            Write-Output "::group::copy $src $dst"
+            Copy-Item $src $dst
+            Write-Output "::endgroup::"
+          }
+          New-Item -Name "dist" -ItemType "directory"
+          Copy-Item-Display base\bedrock_server.db dist\bedrock_server.db
+          $path_chakra = nimble.exe path ezchakra
+          Get-ChildItem $path_chakra |
+            Where-Object { $_.Extension -in '.dll', '.pdb' } |
+            Foreach-Object { Copy-Item-Display $_ (Join-Path "dist\" $_.Name) }
+      - name: Upload dist
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist/
