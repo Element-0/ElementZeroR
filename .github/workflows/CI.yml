@@ -40,16 +40,16 @@ jobs:
         uses: jiro4989/setup-nim-action@v1
         with:
           nim-version: ${{ env.nim_version }}
-      - name: Install dependencies
+      - name: Setup package source
         run: |
           $ini = New-Item -Path (Join-Path $env:APPDATA "nimble\nimble.ini") -Force
           $json = Resolve-Path main\packages.json
-          Write-Output ("::group::Add ElementZero packages source: " + $json)
           Write-Output "[PackageList]" 'name = "ElementZero"' "path = r`"$json`"" | Out-File -FilePath $ini -Encoding utf8 -Append
-          Write-Output "::endgroup::"
           Write-Output "::group::Refresh nimble database"
           nimble.exe refresh
           Write-Output "::endgroup::"
+      - name: Install dependencies
+        run: |
           Write-Output "::group::Install dependencies"
           Push-Location chakra
           nimble.exe install -d
