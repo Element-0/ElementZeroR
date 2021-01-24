@@ -2,6 +2,8 @@
 
 STATE: WIP
 
+[Nim package list](packages.json)
+
 ## Features
 
 1. (Built-in feature) Seprated data folder
