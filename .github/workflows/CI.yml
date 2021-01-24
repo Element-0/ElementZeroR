@@ -55,6 +55,9 @@ jobs:
           nimble.exe install -d
           Pop-Location
           Write-Output "::endgroup::"
+          Write-Output "::group::Install ezmgr"
+          nimble.exe install ezmgr
+          Write-Output "::endgroup::"
       - name: Build and install chakra.dll
         run: |
           Push-Location chakra
