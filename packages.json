@@ -88,6 +88,18 @@
     "web": "https://github.com/Element-0/curl"
   },
   {
+    "name": "ezcommon",
+    "url": "https://github.com/Element-0/common.git",
+    "method": "git",
+    "tags": [
+      "elementzero",
+      "ezlib"
+    ],
+    "description": "Shared code for ElementZero",
+    "license": "LGPL-3.0",
+    "web": "https://github.com/Element-0/common"
+  },
+  {
     "name": "ezpdbparser",
     "url": "https://github.com/Element-0/pdbparser.git",
     "method": "git",
