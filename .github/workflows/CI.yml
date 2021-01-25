@@ -56,7 +56,7 @@ jobs:
           Pop-Location
           Write-Output "::endgroup::"
           Write-Output "::group::Install ezmgr"
-          nimble.exe install ezmgr
+          nimble.exe install ezmgr --cc:vcc --passC:-MD --debuginfo:on --passC:-MD --passC:-GL --opt:speed
           Write-Output "::endgroup::"
       - name: Build and install chakra.dll
         run: |
