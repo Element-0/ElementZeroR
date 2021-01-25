@@ -100,6 +100,20 @@
     "web": "https://github.com/Element-0/common"
   },
   {
+    "name": "ezpipe",
+    "url": "https://github.com/Element-0/pipe.git",
+    "method": "git",
+    "tags": [
+      "elementzero",
+      "ezlib",
+      "windows",
+      "pipe"
+    ],
+    "description": "Named pipes for ElementZero",
+    "license": "LGPL-3.0",
+    "web": "https://github.com/Element-0/pipe"
+  },
+  {
     "name": "ezmgr",
     "url": "https://github.com/Element-0/ezmgr.git",
     "method": "git",
