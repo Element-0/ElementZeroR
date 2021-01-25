@@ -88,12 +88,19 @@ jobs:
             Copy-Item $src $dst
             Write-Output "::endgroup::"
           }
+          function Get-Nimble-Path($name) {
+            (nimble.exe path $name).trim()
+          }
+          function Copy-Nimble-Artifact($name) {
+            Get-Nimble-Path $name |
+              Get-ChildItem |
+              Where-Object { $_.Extension -in '.dll', '.pdb', '.exe' } |
+              Foreach-Object { Copy-Item-Display $_ (Join-Path "dist\" $_.Name) }
+          }
           New-Item -Name "dist" -ItemType "directory" | OUt-Null
           Copy-Item-Display base\bedrock_server.db dist\bedrock_server.db
-          $path_chakra = (nimble.exe path ezchakra).trim()
-          Get-ChildItem $path_chakra |
-            Where-Object { $_.Extension -in '.dll', '.pdb' } |
-            Foreach-Object { Copy-Item-Display $_ (Join-Path "dist\" $_.Name) }
+          Copy-Nimble-Artifact ezchakra
+          Copy-Nimble-Artifact ezmgr
       - name: Upload dist
         uses: actions/upload-artifact@v2
         with:
