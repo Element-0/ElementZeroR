@@ -38,7 +38,7 @@ jobs:
         uses: egor-tensin/vs-shell@v2
       - name: Cache choosenim
         id: cache-choosenim
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.choosenim
           key: choosenim-${{ env.nim_version }}
