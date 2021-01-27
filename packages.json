@@ -100,6 +100,18 @@
     "web": "https://github.com/Element-0/common"
   },
   {
+    "name": "binpak",
+    "url": "https://github.com/Element-0/binpak.git",
+    "method": "git",
+    "tags": [
+      "elementzero",
+      "ezlib"
+    ],
+    "description": "Binary I/O Library",
+    "license": "LGPL-3.0",
+    "web": "https://github.com/Element-0/binpak"
+  },
+  {
     "name": "ezpipe",
     "url": "https://github.com/Element-0/pipe.git",
     "method": "git",
