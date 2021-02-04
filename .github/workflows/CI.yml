@@ -47,6 +47,7 @@ jobs:
             $CurrentDateTime = Get-Date -Format o -AsUTC
             git add --verbose .
             git commit -m "Snapshot from $CurrentDateTime"
+            git remote set-url origin https://action:${{ secrets.PUSH_SNAPSHOT_TOKEN }}@github.com/Element-0/snapshot
             echo "::set-output name=updated::true"
             Write-Output "::endgroup::"
           }
@@ -147,8 +148,7 @@ jobs:
           path: base/bedrock_server_full.db
       - name: Update snapshot
         if: success() && steps.fetch-snapshot.outputs.updated
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.PUSH_SNAPSHOT_TOKEN }}
-          repository: Element-0/snapshot
-          directory: snapshot
+        run: |
+          Push-Location snapshot
+          git push
+          Pop-Location
