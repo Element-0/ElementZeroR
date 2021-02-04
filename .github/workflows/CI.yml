@@ -106,7 +106,6 @@ jobs:
           }
           New-Item -Name "dist" -ItemType "directory" | OUt-Null
           Copy-Item-Display base\bedrock_server.db dist\bedrock_server.db
-          Copy-Item-Display base\bedrock_server_full.db dist\bedrock_server_full.db
           Copy-Nimble-Artifact ezchakra
           Copy-Nimble-Artifact ezmgr
       - name: Upload dist
@@ -114,3 +113,8 @@ jobs:
         with:
           name: dist
           path: dist/
+      - name: Upload full databse
+        uses: actions/upload-artifact@v2
+        with:
+          name: full
+          path: base/bedrock_server_full.db
