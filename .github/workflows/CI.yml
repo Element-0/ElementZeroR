@@ -21,11 +21,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: main
-      - name: Checkout chakra
+      - name: Checkout snapshot
         uses: actions/checkout@v2
         with:
-          repository: Element-0/chakra
-          path: chakra
+          repository: Element-0/snapshot
+          path: snapshot
       - name: Download rcedit.exe
         uses: robinraju/release-downloader@v1
         with:
@@ -43,27 +43,25 @@ jobs:
         uses: jiro4989/setup-nim-action@v1
         with:
           nim-version: ${{ env.nim_version }}
-      - name: Setup package source
-        run: |
-          $ini = New-Item -Path (Join-Path $env:APPDATA "nimble\nimble.ini") -Force
-          $json = Resolve-Path main\packages.json
-          Write-Output "[PackageList]" 'name = "ElementZero"' "path = r`"$json`"" | Out-File -FilePath $ini -Encoding utf8 -Append
-          Write-Output "::group::Refresh nimble database"
-          nimble.exe refresh
-          Write-Output "::endgroup::"
       - name: Install dependencies
         run: |
-          Write-Output "::group::Install dependencies"
-          Push-Location chakra
-          nimble.exe install -d
-          Pop-Location
-          Write-Output "::endgroup::"
+          Push-Location snapshot
+          $Folders = .\Get-InstallOrder.ps1
+          foreach ($Folder in $Folders) {
+            Write-Output "::group::Install $Folder"
+            Push-Location $Folder
+            nimble.exe install --cc:vcc
+            Pop-Location
+            Write-Output "::endgroup::"
+          }
           Write-Output "::group::Install ezmgr"
+          Push-Location packages\ezmgr
           nimble.exe install ezmgr --cc:vcc --passC:-MD --debuginfo:on --passC:-MD --passC:-GL --opt:speed
+          Pop-Location
           Write-Output "::endgroup::"
       - name: Build and install chakra.dll
         run: |
-          Push-Location chakra
+          Push-Location snapshot\packages\chakra
           nimble.exe install
           Pop-Location
       - name: Cache BDS
