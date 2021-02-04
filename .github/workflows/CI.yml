@@ -23,6 +23,24 @@ jobs:
           repository: Element-0/snapshot
           path: snapshot
           submodules: recursive
+      - name: Setup git user
+        uses: fregante/setup-git-user@v1
+      - name: Fetch latest version
+        id: fetch-snapshot
+        run: |
+          Push-Location snapshot
+          Write-Output "::group::Pull from github"
+          git pull --recurse-submodules --jobs=10
+          Write-Output "::endgroup::"
+          $ChangedFiles = git status --porcelain | measure | select -expand Count
+          if ($ChangedFiles -gt 0) {
+            Write-Output "::group::Create commit"
+            $CurrentDateTime = Get-Date -Format o -AsUTC
+            git commit -a -m "Snapshot from $CurrentDateTime"
+            echo "::set-output name=updated::true"
+            Write-Output "::endgroup::"
+          }
+          Pop-Location
       - name: Download rcedit.exe
         uses: robinraju/release-downloader@v1
         with:
@@ -115,3 +133,9 @@ jobs:
         with:
           name: full
           path: base/bedrock_server_full.db
+      - name: Update snapshot
+        if: success() && steps.fetch-snapshot.outputs.updated
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.PUSH_SNAPSHOT_TOKEN }}
+          directory: snapshot
