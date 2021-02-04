@@ -81,7 +81,9 @@ jobs:
         uses: actions/cache@v2
         id: nimble-cache
         with:
-          path: ~/.nimble
+          path: |
+            ~/.nimble
+            !~/.nimble/pkgs/ezchakra-*
           key: nimble-${{ steps.fetch-snapshot.outputs.hash }}
       - name: Install dependencies
         if: steps.nimble-cache.outputs.cache-hit != 'true'
