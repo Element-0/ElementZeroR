@@ -26,6 +26,7 @@ jobs:
         with:
           repository: Element-0/snapshot
           path: snapshot
+          submodules: recursive
       - name: Download rcedit.exe
         uses: robinraju/release-downloader@v1
         with:
