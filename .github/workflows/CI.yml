@@ -29,6 +29,11 @@ jobs:
           git config --local user.name "GitHub Actions"
           git config --local user.email "actions@users.noreply.github.com"
           Pop-Location
+      - name: Write version info
+        run: |
+          Push-Location snapshot
+          @{ bedrock_server: "${{ env.bds_version }}", nim: "${{ env.nim_version }}" } | ConvertTo-Json | Out-File -Encoding utf8 version
+          Pop-Location
       - name: Fetch latest version
         id: fetch-snapshot
         run: |
@@ -40,7 +45,8 @@ jobs:
           if ($ChangedFiles -gt 0) {
             Write-Output "::group::Create commit"
             $CurrentDateTime = Get-Date -Format o -AsUTC
-            git commit -a -m "Snapshot from $CurrentDateTime"
+            git add .
+            git commit -m "Snapshot from $CurrentDateTime"
             echo "::set-output name=updated::true"
             Write-Output "::endgroup::"
           }
