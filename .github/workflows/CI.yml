@@ -32,7 +32,7 @@ jobs:
       - name: Write version info
         run: |
           Push-Location snapshot
-          @{ bedrock_server="${{ env.bds_version }}", nim="${{ env.nim_version }}" } | ConvertTo-Json | Out-File -Encoding utf8 version
+          @{ bedrock_server = "${{ env.bds_version }}"; nim = "${{ env.nim_version }}" } | ConvertTo-Json | Out-File -Encoding utf8 version
           Pop-Location
       - name: Fetch latest version
         id: fetch-snapshot
