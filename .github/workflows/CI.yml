@@ -45,7 +45,7 @@ jobs:
           if ($ChangedFiles -gt 0) {
             Write-Output "::group::Create commit"
             $CurrentDateTime = Get-Date -Format o -AsUTC
-            git add .
+            git add --verbose .
             git commit -m "Snapshot from $CurrentDateTime"
             echo "::set-output name=updated::true"
             Write-Output "::endgroup::"
