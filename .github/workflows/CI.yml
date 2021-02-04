@@ -24,7 +24,11 @@ jobs:
           path: snapshot
           submodules: recursive
       - name: Setup git user
-        uses: fregante/setup-git-user@v1
+        run: |
+          Push-Location snapshot
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "actions@users.noreply.github.com"
+          Pop-Location
       - name: Fetch latest version
         id: fetch-snapshot
         run: |
