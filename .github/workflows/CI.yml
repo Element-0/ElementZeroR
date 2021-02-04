@@ -138,4 +138,5 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.PUSH_SNAPSHOT_TOKEN }}
+          repository: Element-0/snapshot
           directory: snapshot
