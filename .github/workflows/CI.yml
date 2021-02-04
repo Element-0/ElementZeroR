@@ -23,6 +23,7 @@ jobs:
           repository: Element-0/snapshot
           path: snapshot
           submodules: recursive
+          token: ${{ secrets.PUSH_SNAPSHOT_TOKEN }}
       - name: Setup git user
         run: |
           Push-Location snapshot
@@ -47,7 +48,6 @@ jobs:
             $CurrentDateTime = Get-Date -Format o -AsUTC
             git add --verbose .
             git commit -m "Snapshot from $CurrentDateTime"
-            git remote set-url origin https://action:${{ secrets.PUSH_SNAPSHOT_TOKEN }}@github.com/Element-0/snapshot
             echo "::set-output name=updated::true"
             Write-Output "::endgroup::"
           }
