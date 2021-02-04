@@ -84,7 +84,7 @@ jobs:
           path: |
             ~/.nimble
             !~/.nimble/pkgs/ezchakra-*
-          key: nimble-${{ steps.fetch-snapshot.outputs.hash }}
+          key: nimble-${{ steps.fetch-snapshot.outputs.hash }}-${{ hashFiles('~/.nimble/packages_*.json') }}
       - name: Install dependencies
         if: steps.nimble-cache.outputs.cache-hit != 'true'
         run: |
