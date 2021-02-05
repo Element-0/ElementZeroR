@@ -43,7 +43,7 @@ jobs:
         run: |
           Push-Location snapshot
           Write-Output "::group::Pull from github"
-          git pull --recurse-submodules --jobs=10
+          git submodule update --remote
           Write-Output "::endgroup::"
           $ChangedFiles = git status --porcelain | measure | select -expand Count
           if ($ChangedFiles -gt 0) {
