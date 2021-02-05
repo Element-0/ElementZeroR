@@ -76,7 +76,9 @@ jobs:
         with:
           nim-version: ${{ env.nim_version }}
       - name: Refresh package repo
-        run: nimble.exe refresh
+        run: |
+          nimble.exe refresh
+          ls ~/.nimble
       - name: Cache nimble
         uses: actions/cache@v2
         id: nimble-cache
