@@ -79,7 +79,7 @@ jobs:
         id: nimble-refresh
         run: |
           nimble.exe refresh
-          $PackageHash = Get-FileHash C:\Users\CodeHz\.nimble\packages_official.json | select -expand Hash
+          $PackageHash = Get-FileHash ~\.nimble\packages_official.json | select -expand Hash
           echo "::set-output name=hash::$PackageHash"
       - name: Cache nimble
         uses: actions/cache@v2
