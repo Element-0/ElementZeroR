@@ -25,6 +25,20 @@
     "web": "https://github.com/Element-0/cppinterop"
   },
   {
+    "name": "ezprompt",
+    "url": "https://github.com/Element-0/nim-prompt.git",
+    "method": "git",
+    "tags": [
+      "elementzero",
+      "ezlib",
+      "cli",
+      "prompt"
+    ],
+    "description": "Feature-rich readline replacement for ElementZero",
+    "license": "BSD",
+    "web": "https://github.com/Element-0/nim-prompt"
+  },
+  {
     "name": "ezfunchook",
     "url": "https://github.com/Element-0/funchook.git",
     "method": "git",
