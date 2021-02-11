@@ -151,6 +151,7 @@ jobs:
           }
           New-Item -Name "dist" -ItemType "directory" | OUt-Null
           Copy-Item-Display base\bedrock_server.db dist\bedrock_server.db
+          Copy-Nimble-Artifact ezmodutils
           Copy-Nimble-Artifact ezchakra
           Copy-Nimble-Artifact ezmgr
       - name: Upload dist
