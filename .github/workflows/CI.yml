@@ -127,10 +127,8 @@ jobs:
       - name: Generate Symbol Database
         run: |
           Push-Location base
-          Write-Output "::group::Creating minimal db"
+          Write-Output "::group::Creating db"
           ezpdbparser.cmd bedrock_server.pdb --database:bedrock_server.db
-          Write-Output "::group::Creating full db"
-          ezpdbparser.cmd bedrock_server.pdb --database:bedrock_server_full.db --full
           Write-Output "::endgroup::"
           Pop-Location
       - name: Create dist
@@ -159,11 +157,6 @@ jobs:
         with:
           name: dist-${{ steps.fetch-snapshot.outputs.hash }}
           path: dist/
-      - name: Upload full databse
-        uses: actions/upload-artifact@v2
-        with:
-          name: full
-          path: base/bedrock_server_full.db
       - name: Update snapshot
         if: success() && steps.fetch-snapshot.outputs.updated
         run: |
