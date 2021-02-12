@@ -153,6 +153,18 @@
     "web": "https://github.com/Element-0/ezmgr"
   },
   {
+    "name": "ezmodutils",
+    "url": "https://github.com/Element-0/ezmodutils.git",
+    "method": "git",
+    "tags": [
+      "elementzero",
+      "bin"
+    ],
+    "description": "Mod utility for ElementZero",
+    "license": "LGPL-3.0",
+    "web": "https://github.com/Element-0/ezmodutils"
+  },
+  {
     "name": "ezpdbparser",
     "url": "https://github.com/Element-0/pdbparser.git",
     "method": "git",
