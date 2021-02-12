@@ -30,8 +30,8 @@ jobs:
         run: |
           . .\scripts\Invoke-NativeCommand.ps1
           Push-Location snapshot
-          Invoke-NativeCommand git config --local user.name "GitHub Actions"
-          Invoke-NativeCommand git config --local user.email "actions@users.noreply.github.com"
+          Invoke-NativeCommand { git config --local user.name "GitHub Actions" }
+          Invoke-NativeCommand { git config --local user.email "actions@users.noreply.github.com" }
           Pop-Location
       - name: Write version info
         run: |
@@ -47,15 +47,15 @@ jobs:
           . .\scripts\Invoke-NativeCommand.ps1
           Push-Location snapshot
           Write-Output "::group::Pull from github"
-          Invoke-NativeCommand git submodule update --remote
+          Invoke-NativeCommand { git submodule update --remote }
           Write-Output "::endgroup::"
           $ChangedFiles = git status --porcelain | measure | select -expand Count
           if ($ChangedFiles -gt 0) {
             Write-Output "::group::Create commit"
             $CurrentDateTime = Get-Date -Format o -AsUTC
-            Invoke-NativeCommand git diff
-            Invoke-NativeCommand git add .
-            Invoke-NativeCommand git commit -m "Snapshot from $CurrentDateTime"
+            Invoke-NativeCommand { git diff }
+            Invoke-NativeCommand { git add . }
+            Invoke-NativeCommand { git commit -m "Snapshot from $CurrentDateTime" }
             echo "::set-output name=updated::true"
             Write-Output "::endgroup::"
           }
@@ -102,20 +102,20 @@ jobs:
           foreach ($Folder in $Folders) {
             Write-Output "::group::Install $Folder"
             Push-Location $Folder
-            Invoke-NativeCommand nimble.exe install --cc:vcc
+            Invoke-NativeCommand { nimble.exe install --cc:vcc }
             Pop-Location
             Write-Output "::endgroup::"
           }
           Write-Output "::group::Install ezmgr"
           Push-Location packages\ezmgr
-          Invoke-NativeCommand nimble.exe install --cc:vcc --passC:-MD --debuginfo:on
+          Invoke-NativeCommand { nimble.exe install --cc:vcc --passC:-MD --debuginfo:on }
           Pop-Location
           Write-Output "::endgroup::"
       - name: Build and install chakra.dll
         run: |
           . .\scripts\Invoke-NativeCommand.ps1
           Push-Location snapshot\packages\chakra
-          Invoke-NativeCommand nimble.exe install -y
+          Invoke-NativeCommand { nimble.exe install -y }
           Pop-Location
       - name: Cache BDS
         uses: actions/cache@v2
@@ -135,7 +135,7 @@ jobs:
           . .\scripts\Invoke-NativeCommand.ps1
           Push-Location base
           Write-Output "::group::Creating db"
-          Invoke-NativeCommand ezpdbparser.cmd bedrock_server.pdb --database:bedrock_server.db
+          Invoke-NativeCommand { ezpdbparser.cmd bedrock_server.pdb --database:bedrock_server.db }
           Write-Output "::endgroup::"
           Pop-Location
       - name: Create dist
