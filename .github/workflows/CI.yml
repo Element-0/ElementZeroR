@@ -17,6 +17,8 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
+      - name: Checkout scripts
+        uses: actions/checkout@v2
       - name: Checkout snapshot
         uses: actions/checkout@v2
         with:
@@ -26,9 +28,10 @@ jobs:
           token: ${{ secrets.PUSH_SNAPSHOT_TOKEN }}
       - name: Setup git user
         run: |
+          . .\scripts\Invoke-NativeCommand.ps1
           Push-Location snapshot
-          git config --local user.name "GitHub Actions"
-          git config --local user.email "actions@users.noreply.github.com"
+          Invoke-NativeCommand git config --local user.name "GitHub Actions"
+          Invoke-NativeCommand git config --local user.email "actions@users.noreply.github.com"
           Pop-Location
       - name: Write version info
         run: |
@@ -41,17 +44,18 @@ jobs:
       - name: Fetch latest version
         id: fetch-snapshot
         run: |
+          . .\scripts\Invoke-NativeCommand.ps1
           Push-Location snapshot
           Write-Output "::group::Pull from github"
-          git submodule update --remote
+          Invoke-NativeCommand git submodule update --remote
           Write-Output "::endgroup::"
           $ChangedFiles = git status --porcelain | measure | select -expand Count
           if ($ChangedFiles -gt 0) {
             Write-Output "::group::Create commit"
             $CurrentDateTime = Get-Date -Format o -AsUTC
-            git diff
-            git add .
-            git commit -m "Snapshot from $CurrentDateTime"
+            Invoke-NativeCommand git diff
+            Invoke-NativeCommand git add .
+            Invoke-NativeCommand git commit -m "Snapshot from $CurrentDateTime"
             echo "::set-output name=updated::true"
             Write-Output "::endgroup::"
           }
@@ -92,24 +96,26 @@ jobs:
       - name: Install dependencies
         if: steps.nimble-cache.outputs.cache-hit != 'true'
         run: |
+          . .\scripts\Invoke-NativeCommand.ps1
           Push-Location snapshot
           $Folders = .\Get-InstallOrder.ps1
           foreach ($Folder in $Folders) {
             Write-Output "::group::Install $Folder"
             Push-Location $Folder
-            & nimble.exe install --cc:vcc
+            Invoke-NativeCommand nimble.exe install --cc:vcc
             Pop-Location
             Write-Output "::endgroup::"
           }
           Write-Output "::group::Install ezmgr"
           Push-Location packages\ezmgr
-          & nimble.exe install --cc:vcc --passC:-MD --debuginfo:on
+          Invoke-NativeCommand nimble.exe install --cc:vcc --passC:-MD --debuginfo:on
           Pop-Location
           Write-Output "::endgroup::"
       - name: Build and install chakra.dll
         run: |
+          . .\scripts\Invoke-NativeCommand.ps1
           Push-Location snapshot\packages\chakra
-          nimble.exe install -y
+          Invoke-NativeCommand nimble.exe install -y
           Pop-Location
       - name: Cache BDS
         uses: actions/cache@v2
@@ -126,9 +132,10 @@ jobs:
           $tmp | Expand-Archive -DestinationPath base
       - name: Generate Symbol Database
         run: |
+          . .\scripts\Invoke-NativeCommand.ps1
           Push-Location base
           Write-Output "::group::Creating db"
-          ezpdbparser.cmd bedrock_server.pdb --database:bedrock_server.db
+          Invoke-NativeCommand ezpdbparser.cmd bedrock_server.pdb --database:bedrock_server.db
           Write-Output "::endgroup::"
           Pop-Location
       - name: Create dist
