@@ -79,6 +79,9 @@ jobs:
         uses: jiro4989/setup-nim-action@v1
         with:
           nim-version: ${{ env.nim_version }}
+      - name: Setup nim problem matcher
+        run: |
+          echo "::add-matcher::.github/nim.json"
       - name: Refresh package repo
         id: nimble-refresh
         run: |
