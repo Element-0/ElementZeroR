@@ -82,7 +82,8 @@ jobs:
       - name: Refresh package repo
         id: nimble-refresh
         run: |
-          nimble.exe refresh
+          . .\scripts\Invoke-NativeCommand.ps1
+          Invoke-NativeCommand { nimble.exe refresh }
           $PackageHash = Get-FileHash ~\.nimble\packages_official.json | select -expand Hash
           echo "::set-output name=hash::$PackageHash"
       - name: Cache nimble
