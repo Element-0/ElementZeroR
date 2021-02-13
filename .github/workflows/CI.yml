@@ -4,7 +4,7 @@ name: CI
 
 env:
   bds_version: 1.16.201.02
-  nim_version: 1.4.2
+  nim_version: version-1-4
 
 on:
   push:
@@ -75,10 +75,11 @@ jobs:
           Write-Output "${{ runner.tool_cache }}\rcedit" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Set up Visual Studio shell
         uses: egor-tensin/vs-shell@v2
-      - name: Install nim
-        uses: jiro4989/setup-nim-action@v1
+      - name: Setup nim
+        uses: alaviss/setup-nim@0.1.1
         with:
-          nim-version: ${{ env.nim_version }}
+          path: "${{ runner.tool_cache }}/nim"
+          version: ${{ env.nim_version }}
       - name: Refresh package repo
         id: nimble-refresh
         run: |
